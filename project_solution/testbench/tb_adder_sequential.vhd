@@ -107,6 +107,9 @@ begin
                    "SUM = " & integer'image(res) & "; " &
                    "SUM_expected = " & integer'image(res_expected)
             severity error;
+
+            -- Wait for the circuit to go back into the IDLE state.
+            wait until DONE = '0';
         end procedure check_add;
 
     begin
@@ -116,6 +119,7 @@ begin
         OP2   <= (others => '0');
         RST   <= '0';
         START <= '0';
+        wait for CLK_PERIOD;
 
         -- Reset the circuit.
         async_reset;

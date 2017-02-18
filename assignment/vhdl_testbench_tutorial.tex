@@ -60,18 +60,18 @@
         \item Sequential adder (Figure~\ref{fig:adder_sequential_interface}.)
     \end{enumerate}
 
-    In turn, each design is based upon the implementation of a 1-bit combinatorial full-adder. We assume the 1-bit full-adder is correct, so we will not be explicitly testing it.
+    Each design is based upon the implementation of a 1-bit combinatorial full-adder. We assume the 1-bit full-adder is correct, so we will not be explicitly testing it. \\
 
     \begin{figure*}[!h]
         \centering
-        \begin{subfigure}[t]{0.35\textwidth}
+        \begin{subfigure}[t]{0.3\textwidth}
             \centering
             \includegraphics[width=1.0\textwidth]{figs/adder_combinatorial_interface.pdf}
             \caption{Combinatorial adder}
             \label{fig:adder_combinatorial_interface}
         \end{subfigure}
         \hspace{1em}
-        \begin{subfigure}[t]{0.35\textwidth}
+        \begin{subfigure}[t]{0.3\textwidth}
             \centering
             \includegraphics[width=1.0\textwidth]{figs/adder_sequential_interface.pdf}
             \caption{Sequential adder}
@@ -79,6 +79,9 @@
         \end{subfigure}
         \caption{Adders}
     \end{figure*}
+
+    Note that the component being tested is often called the \emph{Design Under Test (DUT)}.
+
 \end{section}
 
 \begin{section}{Setup}
@@ -159,7 +162,7 @@
     \begin{subsection}{Minimum testbench}
         ModelSim complains about the fact the testbench is empty, so let's begin by filling it up with the minimum code needed to compile. \\
 
-        All VHDL files must have an \emph{entity}, so we must write one for this testbench. An entity represents the input and output ports of a component. This makes sense if the VHDL file is describing some RTL design, but it doesn't make much sense in the case of a testbench. Indeed, a testbench is not a ``component'' which will be used in a design, but merely a simple VHDL file which is used to provide inputs to, and monitor the outputs from a specific component \footnote{Note that the component to be tested is often called the \emph{Design Under Test (DUT)}.} (the combinatorial adder in this case). So the testbench essentially has an \emph{empty} entity.
+        All VHDL files must have an \emph{entity}, so we must write one for this testbench. An entity represents the input and output ports of a component. This makes sense if the VHDL file is describing some RTL design, but it doesn't make much sense in the case of a testbench. Indeed, a testbench is not a ``component'' which will be used in a design, but merely a simple VHDL file which is used to provide inputs to, and monitor the outputs from the DUT (the combinatorial adder in this case). So the testbench essentially has an \emph{empty} entity.
 
         \begin{lstlisting}[caption={Minimum testbench (only empty entity)}, captionpos=b, label={lst:combinatorial_minimum_testbench}]
 entity tb_adder_combinatorial is
@@ -187,6 +190,7 @@ end architecture test;
     \clearpage
 
     \begin{subsection}{Instantiating the DUT}
+        \label{sec:combinatorial_instantiating_dut}
         In order to test a component, we must have access to it. So the next step is to take the DUT, instantiate it, and wire it into the testbench. After this step, we would be able to interact with the DUT as if it were a component in the ``design'' (although we are not designing anything here, just testing). \\
 
         Wiring the DUT into the testbench requires information about its entity. The combinatorial adder's entity is presented in Listing~\ref{lst:adder_combinatorial_entity}. Note that the DUT is \emph{generic}: at instantiation time, the component can be configured with a specific width depending on the value provided in its \verb+N_BITS+ parameter.
@@ -250,6 +254,7 @@ end architecture test;
         Now that the DUT is instantiated and wired into the testbench, we can start feeding it inputs to make the circuit actually do something.
 
         \begin{subsubsection}{Basic input feeding}
+            \label{sec:combinatorial_basic_input_feeding}
             Let's go over what we are trying to achieve to see how to write the part of the testbench responsible for feeding data to the DUT. We would like to feed test vectors in \emph{sequence} to the unit, something like the execution below:
 
             \begin{enumerate}
@@ -260,7 +265,7 @@ end architecture test;
                 \item \ldots
             \end{enumerate}
 
-            In VHDL, recall that processes execute in parallel among each other, but the statements within each process execute in \emph{sequence}. This observation is key to writing the input-feeding part of the testbench: we can provide all inputs in a single process, separated by time intervals, and each vector will be executed one after the other until there no longer are any statements left in the process. It may be complicated to see why this works in words, so let's look at a concrete example to see how this all works.
+            In VHDL, recall that processes execute in \emph{parallel} among each other, but the statements within each process execute in \emph{sequence}. This observation is key to writing the input-feeding part of the testbench: we can provide all inputs in a single process, separated by time intervals, and each vector will be executed one after the other until there no longer are any statements left in the process. It may be complicated to see why this works in words, so let's look at a concrete example to see how this all works.
 
             \begin{lstlisting}[caption={Simulation process (basic)}, captionpos=b, label={lst:combinatorial_simulation_process_1_test_vector}]
 library ieee;
@@ -377,7 +382,7 @@ end architecture test;
                 \end{centering}
             \end{figure}
 
-            The results look correct, i.e. $1 + 5 = 6$ and $3 + 2 = 5$, so at least the circuit is behaving correctly with these 2 input vectors. However, notice that the simulation is ``looping'' and is applying the two input vectors 3 times. Recall how processes work in VHDL. A process executes all its statements sequentially, then restarts. In the testbench, the simulation process uses 2 \verb+wait+ statements for a total of \SI{200}{\nano\second} of simulation time. Since we asked for a \SI{600}{\nano\second} simulation, the process had enough time to restart 3 times. \\
+            The results look correct, i.e. $1 + 5 = 6$ and $3 + 2 = 5$, so at least the circuit is behaving correctly with these 2 input vectors. However, notice that the simulation is ``looping'' and is applying the two input vectors 3 times. Recall how processes work in VHDL. A process executes all its statements sequentially, then restarts. In the testbench, the simulation process uses 2 \verb+wait+ statements for a total of \SI{200}{\nano\second} of simulation time. Since we asked for a \SI{600}{\nano\second} simulation, the process had enough time to restart 3 times.
         \end{enumerate}
 
         \clearpage
@@ -500,6 +505,7 @@ architecture test of tb_adder_combinatorial is
     signal SUM : std_logic_vector(N_BITS downto 0);
 
 begin
+
     -- Instantiate DUT
     dut : entity work.adder_combinatorial
     generic map(N_BITS => N_BITS)
@@ -657,7 +663,464 @@ end architecture test;
 \clearpage
 
 \begin{section}{Testing the sequential adder}
-TODO
+    We will now write, from scratch, the testbench for the sequential adder. All code presented in this section is to be written in \verb+testbench/tb_adder_sequential.vhd+.
+
+    \begin{subsection}{Instantiating the DUT}
+        Let's start by instantiating the DUT and wiring it into the testbench. We use the same algorithm described in Section~\ref{sec:combinatorial_instantiating_dut} to obtain Listing~\ref{lst:sequential_instantiate_dut}.
+
+        \begin{lstlisting}[caption={Instantiate DUT}, captionpos=b, label={lst:sequential_instantiate_dut}]
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity tb_adder_sequential is
+end tb_adder_sequential;
+
+architecture test of tb_adder_sequential is
+
+    -- adder_sequential GENERICS
+    constant N_BITS : positive range 2 to positive'right := 4;
+
+    -- adder_sequential PORTS
+    signal CLK   : std_logic;
+    signal RST   : std_logic;
+    signal START : std_logic;
+    signal OP1   : std_logic_vector(N_BITS - 1 downto 0);
+    signal OP2   : std_logic_vector(N_BITS - 1 downto 0);
+    signal SUM   : std_logic_vector(N_BITS downto 0);
+    signal DONE  : std_logic;
+
+begin
+
+    -- Instantiate DUT
+    dut : entity work.adder_sequential
+    generic map(N_BITS => N_BITS)
+    port map(CLK   => CLK,
+             RST   => RST,
+             START => START,
+             OP1   => OP1,
+             OP2   => OP2,
+             SUM   => SUM,
+             DONE  => DONE);
+
+end architecture test;
+        \end{lstlisting}
+    \end{subsection}
+
+    \clearpage
+
+    \begin{subsection}{Generating a clock signal}
+        The sequential adder is a synchronous component as it is sensitive to a clock. We saw in Section~\ref{sec:combinatorial_basic_input_feeding} that, for simulation purposes, one can assign values to signals by using a VHDL process. We do the same in Listing~\ref{lst:sequential_process_generate_clk} specifically for generating the \verb+CLK+ input of the DUT.
+
+        \begin{lstlisting}[caption={Add process for generating \texttt{CLK} signal}, captionpos=b, label={lst:sequential_process_generate_clk}]
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity tb_adder_sequential is
+end tb_adder_sequential;
+
+architecture test of tb_adder_sequential is
+
+    constant CLK_PERIOD : time := 100 ns;
+
+    -- adder_sequential GENERICS
+    constant N_BITS : positive range 2 to positive'right := 4;
+
+    -- adder_sequential PORTS
+    signal CLK   : std_logic;
+    signal RST   : std_logic;
+    signal START : std_logic;
+    signal OP1   : std_logic_vector(N_BITS - 1 downto 0);
+    signal OP2   : std_logic_vector(N_BITS - 1 downto 0);
+    signal SUM   : std_logic_vector(N_BITS downto 0);
+    signal DONE  : std_logic;
+
+begin
+
+    -- Instantiate DUT
+    dut : entity work.adder_sequential
+    generic map(N_BITS => N_BITS)
+    port map(CLK   => CLK,
+             RST   => RST,
+             START => START,
+             OP1   => OP1,
+             OP2   => OP2,
+             SUM   => SUM,
+             DONE  => DONE);
+
+    -- Generate CLK signal
+    clk_generation : process
+    begin
+        clk <= '1';
+        wait for CLK_PERIOD / 2;
+        clk <= '0';
+        wait for CLK_PERIOD / 2;
+    end process clk_generation;
+
+end architecture test;
+        \end{lstlisting}
+
+        Note the absence of any \emph{indefinite} \verb+wait+ statement in the \verb+clk_generation+ process. It is important that one \emph{not} use such an indefinite \verb+wait+ statement, otherwise the process would only generate a single clock pulse before halting instead of continuously generating clock pulses each time the process restarts. \\
+
+        A consequence of this design is that one cannot use the \verb+run -all+ command in ModelSim, but must instead explicitly provide a simulation duration such as \verb+run 1000 ns+.
+    \end{subsection}
+
+    \begin{subsection}{Feeding inputs to the DUT}
+
+        \begin{subsubsection}{Default DUT inputs}
+            In Section~\ref{sec:combinatorial_basic_input_feeding}, we used a \emph{single} process for feeding inputs to the \emph{combinatorial} adder. Could we envision doing the same thing for the \emph{sequential} adder (i.e. use a \emph{single} process for generating the clock signal and the non-clock signals)? \\
+
+            A clock signal is \emph{periodic}, whereas non-clock signals are generally \emph{non-periodic}. Recall the execution model of VHDL processes: processes execute in \emph{parallel} among each other, but the statements within each process execute in \emph{sequence}. Given this execution model, there is no way to describe the periodic behaviour of a clock parallely to the sequential behaviour of the other input signals in a \emph{single} process. \\
+
+            However, it is possible to do so with \emph{multiple} processes. One process can periodically generate a clock signal, while another process can sequentially generate the non-clock signals which are to be fed to the DUT. The 2 processes execute in parallel, so we can correctly model the periodic and non-periodic behaviour of our 2 signal categories (clock and non-clock). \\
+
+            Therefore, we update our testbench with a second process called \verb+simulation+ which is responsible for generating the non-clock inputs of the DUT. Our first attempt is shown in Listing~\ref{lst:sequential_process_simulation_default_values} where the testbench just assigns default values to the DUT's non-clock signals.
+
+            \begin{lstlisting}[caption={Add \texttt{simulation} process for generating non-clock signals to the DUT. This first version only assigns default values to the non-clock signals.}, captionpos=b, label={lst:sequential_process_simulation_default_values}]
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity tb_adder_sequential is
+end tb_adder_sequential;
+
+architecture test of tb_adder_sequential is
+
+    constant CLK_PERIOD : time := 100 ns;
+
+    -- adder_sequential GENERICS
+    constant N_BITS : positive range 2 to positive'right := 4;
+
+    -- adder_sequential PORTS
+    signal CLK   : std_logic;
+    signal RST   : std_logic;
+    signal START : std_logic;
+    signal OP1   : std_logic_vector(N_BITS - 1 downto 0);
+    signal OP2   : std_logic_vector(N_BITS - 1 downto 0);
+    signal SUM   : std_logic_vector(N_BITS downto 0);
+    signal DONE  : std_logic;
+
+begin
+
+    -- Instantiate DUT
+    dut : entity work.adder_sequential
+    generic map(N_BITS => N_BITS)
+    port map(CLK   => CLK,
+             RST   => RST,
+             START => START,
+             OP1   => OP1,
+             OP2   => OP2,
+             SUM   => SUM,
+             DONE  => DONE);
+
+    -- Generate CLK signal
+    clk_generation : process
+    begin
+        clk <= '1';
+        wait for CLK_PERIOD / 2;
+        clk <= '0';
+        wait for CLK_PERIOD / 2;
+    end process clk_generation;
+
+    -- Test adder_sequential
+    simulation : process
+    begin
+        -- Default values
+        OP1   <= (others => '0');
+        OP2   <= (others => '0');
+        RST   <= '0';
+        START <= '0';
+        wait for CLK_PERIOD;
+    end process simulation;
+
+end architecture test;
+            \end{lstlisting}
+        \end{subsubsection}
+
+        \begin{subsubsection}{Resetting the DUT}
+            The DUT is a synchronous circuit and has an \emph{asynchronous} reset input, verb+RST+. When testing a component, it is a good practice to supply it with a reset pulse before feeding it any other inputs. This guarantees the DUT is in a valid state before we do anything. We update the \verb+simulation+ process with an \verb+async_reset+ \emph{procedure} for this.
+
+            \begin{lstlisting}[caption={Add \emph{asynchronous} reset}, captionpos=b, label={lst:sequential_process_simulation_async_reset}]
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity tb_adder_sequential is
+end tb_adder_sequential;
+
+architecture test of tb_adder_sequential is
+
+    constant CLK_PERIOD : time := 100 ns;
+
+    -- adder_sequential GENERICS
+    constant N_BITS : positive range 2 to positive'right := 4;
+
+    -- adder_sequential PORTS
+    signal CLK   : std_logic;
+    signal RST   : std_logic;
+    signal START : std_logic;
+    signal OP1   : std_logic_vector(N_BITS - 1 downto 0);
+    signal OP2   : std_logic_vector(N_BITS - 1 downto 0);
+    signal SUM   : std_logic_vector(N_BITS downto 0);
+    signal DONE  : std_logic;
+
+begin
+
+    -- Instantiate DUT
+    dut : entity work.adder_sequential
+    generic map(N_BITS => N_BITS)
+    port map(CLK   => CLK,
+             RST   => RST,
+             START => START,
+             OP1   => OP1,
+             OP2   => OP2,
+             SUM   => SUM,
+             DONE  => DONE);
+
+    -- Generate CLK signal
+    clk_generation : process
+    begin
+        clk <= '1';
+        wait for CLK_PERIOD / 2;
+        clk <= '0';
+        wait for CLK_PERIOD / 2;
+    end process clk_generation;
+
+    -- Test adder_sequential
+    simulation : process
+
+        procedure async_reset is
+        begin
+            wait until rising_edge(CLK);
+            wait for CLK_PERIOD / 4;
+            RST <= '1';
+
+            wait for CLK_PERIOD / 2;
+            RST <= '0';
+        end procedure async_reset;
+
+    begin
+
+        -- Default values
+        OP1   <= (others => '0');
+        OP2   <= (others => '0');
+        RST   <= '0';
+        START <= '0';
+        wait for CLK_PERIOD;
+
+        -- Reset the circuit.
+        async_reset;
+    end process simulation;
+
+end architecture test;
+            \end{lstlisting}
+        \end{subsubsection}
+
+        \begin{subsubsection}{Self-checking test vectors}
+
+            Now that the DUT is in a valid initial state, we can start feeding it test vectors and automatically check if the output is correct. We create a \verb+check_add+ \emph{procedure} for this purpose, similarly as for the combinatorial adder.
+
+            \begin{lstlisting}[caption={Add test vectors}, captionpos=b, label={lst:sequential_process_simulation_test_vectors}]
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity tb_adder_sequential is
+end tb_adder_sequential;
+
+architecture test of tb_adder_sequential is
+
+    constant CLK_PERIOD : time := 100 ns;
+
+    -- adder_sequential GENERICS
+    constant N_BITS : positive range 2 to positive'right := 4;
+
+    -- adder_sequential PORTS
+    signal CLK   : std_logic;
+    signal RST   : std_logic;
+    signal START : std_logic;
+    signal OP1   : std_logic_vector(N_BITS - 1 downto 0);
+    signal OP2   : std_logic_vector(N_BITS - 1 downto 0);
+    signal SUM   : std_logic_vector(N_BITS downto 0);
+    signal DONE  : std_logic;
+
+begin
+
+    -- Instantiate DUT
+    dut : entity work.adder_sequential
+    generic map(N_BITS => N_BITS)
+    port map(CLK   => CLK,
+             RST   => RST,
+             START => START,
+             OP1   => OP1,
+             OP2   => OP2,
+             SUM   => SUM,
+             DONE  => DONE);
+
+    -- Generate CLK signal
+    clk_generation : process
+    begin
+        clk <= '1';
+        wait for CLK_PERIOD / 2;
+        clk <= '0';
+        wait for CLK_PERIOD / 2;
+    end process clk_generation;
+
+    -- Test adder_sequential
+    simulation : process
+
+        procedure async_reset is
+        begin
+            wait until rising_edge(CLK);
+            wait for CLK_PERIOD / 4;
+            RST <= '1';
+
+            wait for CLK_PERIOD / 2;
+            RST <= '0';
+        end procedure async_reset;
+
+        procedure check_add(constant in1          : in natural;
+                            constant in2          : in natural;
+                            constant res_expected : in natural) is
+            variable res : natural;
+        begin
+            -- Our circuit is sensitive to the rising edge of the CLK, so we
+            -- need to be sure to assign signal values such that they are stable
+            -- at the next rising edge of the CLK.
+            wait until rising_edge(CLK);
+
+            -- Assign values to circuit inputs.
+            OP1   <= std_logic_vector(to_unsigned(in1, OP1'length));
+            OP2   <= std_logic_vector(to_unsigned(in2, OP2'length));
+            START <= '1';
+
+            -- OP1, OP2 and START are NOT yet assigned. We have to wait for some
+            -- time for the simulator to "propagate" their values. Any
+            -- infinitesimal period would work for the simulator to "propagate"
+            -- the values. However, our circuit is a sequential circuit
+            -- sensitive to the rising edge of CLK, so we need to hold our
+            -- signal assignments until the next rising edge of CLK so the
+            -- circuit can see them.
+            wait until rising_edge(CLK);
+
+            -- Remove values from circuit inputs. The circuit works with a PULSE
+            -- on its START input, which means that data on the inputs only
+            -- needs to be valid when START is high.
+            OP1   <= (others => '0');
+            OP2   <= (others => '0');
+            START <= '0';
+
+            -- The circuit informs us it has finished by asserting DONE, so we
+            -- can wait until we receive the signal before proceeding. DONE is
+            -- asserted at the rising edge of CLK, so we (the test system) can
+            -- sample the data and check its correctness.
+            wait until DONE = '1';
+
+            -- Check output against expected result.
+            res := to_integer(unsigned(SUM));
+            assert res = res_expected
+            report "Unexpected result: " &
+                   "OP1 = " & integer'image(in1) & "; " &
+                   "OP2 = " & integer'image(in2) & "; " &
+                   "SUM = " & integer'image(res) & "; " &
+                   "SUM_expected = " & integer'image(res_expected)
+            severity error;
+
+            -- Wait for the circuit to go back into the IDLE state.
+            wait until DONE = '0';
+        end procedure check_add;
+
+    begin
+
+        -- Default values
+        OP1   <= (others => '0');
+        OP2   <= (others => '0');
+        RST   <= '0';
+        START <= '0';
+        wait for CLK_PERIOD;
+
+        -- Reset the circuit.
+        async_reset;
+
+        -- Check test vectors against expected outputs
+        check_add(12, 8, 20);
+    end process simulation;
+
+end architecture test;
+            \end{lstlisting}
+
+            Let's simulate our current testbench and see what we get.
+
+            \begin{enumerate}
+                \item Click on the \includegraphics[height=11pt]{figs/compile_all_icon.png} icon to compile all sources. You should get something similar to Figure~\ref{fig:compiling_with_sequential_testbench}. All files should successfully compile as they now all contain valid VHDL.
+
+                \begin{figure}[!h]
+                    \begin{centering}
+                        \includegraphics[width=0.85\textwidth]{figs/compiling_with_sequential_testbench.png}
+                        \caption{Compiling all testbenches}
+                        \label{fig:compiling_with_sequential_testbench}
+                    \end{centering}
+                \end{figure}
+
+                \item Go to \verb+Simulate > Start Simulation...+
+
+                \item Select \verb+work > tb_adder_sequential+, then press \verb+OK+ (Figure~\ref{fig:start_tb_adder_sequential_simulation}).
+
+                \begin{figure}[!h]
+                    \begin{centering}
+                        \includegraphics[width=0.50\textwidth]{figs/start_tb_adder_sequential_simulation.png}
+                        \caption{Start simulation}
+                        \label{fig:start_tb_adder_sequential_simulation}
+                    \end{centering}
+                \end{figure}
+
+                \item In the \verb+sim+ tab, click on \verb+tb_adder_sequential+ (Figure~\ref{fig:sim_tab_tb_adder_sequential_simulation}).
+
+                \begin{figure}[!h]
+                    \begin{centering}
+                        \includegraphics[width=0.75\textwidth]{figs/sim_tab_tb_adder_sequential_simulation.png}
+                        \caption{Simulation tab}
+                        \label{fig:sim_tab_tb_adder_sequential_simulation}
+                    \end{centering}
+                \end{figure}
+
+                \item Go to \verb+Add > To Wave > All items in region+.
+
+                \item Finally, in the simulation transcript, type \verb+restart -f; run 2000 ns;+ (Figure~\ref{fig:waveform_sequential_transcript_basic_version}). A waveform window should appear with the result of the simulation (Figure~\ref{fig:waveform_sequential_process_reexecutes}).
+
+                \begin{figure}[!h]
+                    \begin{centering}
+                        \includegraphics[width=0.5\textwidth]{figs/waveform_sequential_transcript_basic_version.png}
+                        \caption{Transcript}
+                        \label{fig:waveform_sequential_transcript_basic_version}
+                    \end{centering}
+                \end{figure}
+
+                \begin{figure}[!h]
+                    \begin{centering}
+                        \includegraphics[width=0.85\textwidth]{figs/waveform_sequential_process_reexecutes.png}
+                        \caption{Waveform (repetitive input feeding)}
+                        \label{fig:waveform_sequential_process_reexecutes}
+                    \end{centering}
+                \end{figure}
+
+                The results look correct:
+
+                \begin{enumerate}
+                    \item The circuit seems to be reset as the \verb+SUM+ output changes as soon as \verb+RST+ is high (recall it is an \emph{asynchronous} reset, so various registers should be reset as soon as the reset signal is high, and \emph{not} at the next rising edge of the clock signal).
+
+                    \item The test vector $12 + 8 = 20$ is correct.
+                \end{enumerate}
+
+                However, we suffer from the ``loopy'' execution of the \verb+simulation+ process again, as was previously seen for the combinatorial adder. We will address this issue next so we can take advantage of ModelSim's practical automatic simulation termination command, \verb+run -all+.
+            \end{enumerate}
+        \end{subsubsection}
+    \end{subsection}
+
+    \begin{subsection}{Automatic simulation termination}
+        For the combinatorial adder, we saw how to stop a process from re-executing by means of an \emph{indefinite} \verb+wait+ statement. We would like to use the same technique to automatically halt the simulation once all test vectors have gone through the DUT.
+    \end{subsection}
 \end{section}
 
 %=============================================================================
