@@ -19,6 +19,7 @@ architecture test of tb_adder_combinatorial is
     signal SUM : std_logic_vector(N_BITS downto 0);
 
 begin
+
     -- Instantiate DUT
     dut : entity work.adder_combinatorial
     generic map(N_BITS => N_BITS)

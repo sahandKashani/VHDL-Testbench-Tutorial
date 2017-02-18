@@ -25,6 +25,7 @@ architecture test of tb_adder_sequential is
     signal DONE  : std_logic;
 
 begin
+
     -- Instantiate DUT
     dut : entity work.adder_sequential
     generic map(N_BITS => N_BITS)

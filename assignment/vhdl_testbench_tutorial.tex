@@ -1,61 +1,42 @@
-%!TEX options = --shell-escape
-\documentclass[a4paper, 12pt, onecolumn]{article}
+% $Author: skashani $
+% $Date: 2017/02/18 17:58:10 $
+% $Revision: 1.0 $
+%
+%=============================================================================
+\documentclass[lab]{course}
 
 \usepackage{caption}
 \usepackage{dirtree}
-\usepackage{enumitem}
-\usepackage{fancyhdr}
-\usepackage[T1]{fontenc}
-\usepackage{geometry}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage[utf8]{inputenc}
-\usepackage{minted}
+\usepackage[binary-units=true]{siunitx}
 \usepackage{subcaption}
-
-\geometry{
-    a4paper,
-    left=20mm,
-    right=20mm,
-    top=30mm,
-    bottom=27mm,
-}
-
-\renewcommand{\familydefault}{\sfdefault}
-\setlength\parindent{0pt}
-\renewcommand\headrulewidth{0.4pt}
-\renewcommand\footrulewidth{0.4pt}
-
-\newcommand{\documentTitle}{VHDL Testbench Tutorial}
-
-\title{\documentTitle}
-\date{\today}
-\author{Sahand Kashani-Akhavan}
-
-\pagestyle{fancy}
-\lhead{\documentTitle}
-\rhead{LAP -- EPFL}
-\cfoot{\thepage}
-
-% Reduce spacing used between enumerations
-\setlist[1]{itemsep=0pt}
-
-\setminted[vhdl]{
-    autogobble=true,
-    baselinestretch=1.0,
-    fontsize=\footnotesize,
-    frame=single,
-    framesep=2mm,
-    linenos=true,
-    style=default
-}
-
+%=============================================================================
 \begin{document}
 
-\maketitle
-\tableofcontents
+\lstset{language=VHDL}
+\lstset{showstringspaces=false}
 
-\clearpage
+\setlength\parindent{0pt}
+
+\rcsInfo $Id: vhdl_testbench_tutorial.tex,v 1.0 2017/02/18 17:58:10 skashani Exp $
+
+\title{%
+  VHDL Testbench Tutorial}
+\subtitle{%
+  }
+\learninggoal{% compulsory
+  Learning how to write a testbench in VHDL.}
+\requirements{% optional
+  ModelSim.}
+\createdby{% optional
+  Sahand Kashani-Akhavan.}
+% \modifiedby{% optional
+%   An Other.}
+\maketitle
+
+%=============================================================================
+\sloppy % bad practice but handy...
+
+%=============================================================================
 
 \begin{section}{Introduction}
     An engineer's job does not stop after having created a ``solution'' to a specific problem, but he/she must also be able to demonstrate, to various degrees of certitude, that the solution is \emph{correct}. This statement is equally valid in both software \& hardware engineering, but it is especially important in the hardware domain, as errors can generally not be fixed once a product has been shipped to customers! \\
@@ -117,7 +98,7 @@
         }
 
         \begin{enumerate}
-            \item The \textbf{modelsim} folder will be used by ModelSim as its working directory.
+            \item The \textbf{modelsim} folder will be used by ModelSim for its working directory.
             \item The \textbf{testbench} folder contains 100\% empty files in which we will write our testbenches for the combinatorial and sequential adders.
             \item The \textbf{vhdl} folder contains the RTL designs of our 2 adders and of the 1-bit full-adder on which they are based.
         \end{enumerate}
@@ -125,11 +106,11 @@
 
     \begin{subsection}{ModelSim setup}
         \begin{enumerate}
-            \item Launch ModelSim and create a new project with \textit{\texttt{File > New > Project...}}
+            \item Launch ModelSim and create a new project with \verb+File > New > Project...+
 
-            \item Name the project \texttt{vhdl\_testbench\_tutorial} and choose the \textbf{modelsim} folder from the extracted archive for the \textit{\texttt{Project Location}} (Figure~\ref{fig:create_project})
+            \item Name the project \verb+vhdl_testbench_tutorial+ and choose the \textbf{modelsim} folder from the extracted archive for the \verb+Project Location+ (Figure~\ref{fig:create_project})
 
-            \item Click on the \textit{\texttt{Add Existing File}} button and add all files in the \textbf{vhdl} and \textbf{testbench} directories to the project (Figure~\ref{fig:add_files_to_project}).
+            \item Click on the \verb+Add Existing File+ button and add all files in the \textbf{vhdl} and \textbf{testbench} directories to the project (Figure~\ref{fig:add_files_to_project}).
 
                 \begin{figure*}[!h]
                     \centering
@@ -146,20 +127,20 @@
                         \caption{Add items files to the project}
                         \label{fig:add_files_to_project}
                     \end{subfigure}
-                    % \begin{subfigure}[t]{0.85\textwidth}
-                    %     \centering
-                    %     \includegraphics[width=0.85\textwidth]{figs/compiling_with_empty_testbenches.png}
-                    %     \caption{Compiling all designs (empty testbenches)}
-                    %     \label{fig:compiling_with_empty_testbenches}
-                    % \end{subfigure}
+                    \begin{subfigure}[t]{1.0\textwidth}
+                        \centering
+                        \includegraphics[width=0.825\textwidth]{figs/files_added_to_project.png}
+                        \caption{Files added to project}
+                        \label{fig:files_added_to_project}
+                    \end{subfigure}
                     \caption{ModelSim project creation}
                 \end{figure*}
 
-            \item Click on the \includegraphics[height=12pt]{figs/compile_all_icon.png} icon to compile all sources. The RTL files will compile successfully, but the testbenches will fail to compile (Figure~\ref{fig:compiling_with_empty_testbenches}). This is normal as the testbench files are empty, so ModelSim does not detect any entity to compile.
+            \item Click on the \includegraphics[height=11pt]{figs/compile_all_icon.png} icon to compile all sources. The RTL files will compile successfully, but the testbenches will fail to compile (Figure~\ref{fig:compiling_with_empty_testbenches}). This is normal as the testbench files are empty, so ModelSim does not detect any entity to compile.
 
                 \begin{figure}[!h]
                     \begin{centering}
-                        \includegraphics[width=0.85\textwidth]{figs/compiling_with_empty_testbenches.png}
+                        \includegraphics[width=0.825\textwidth]{figs/compiling_with_empty_testbenches.png}
                         \caption{Compiling all files (empty testbenches)}
                         \label{fig:compiling_with_empty_testbenches}
                     \end{centering}
@@ -173,61 +154,55 @@
 \clearpage
 
 \begin{section}{Testing the combinatorial adder}
-    We will now write, from scratch, the testbench for the combinatorial adder. All code presented in this section is to be written in \texttt{testbench/tb\_adder\_combinatorial.vhd}.
+    We will now write, from scratch, the testbench for the combinatorial adder. All code presented in this section is to be written in \verb+testbench/tb_adder_combinatorial.vhd+.
 
     \begin{subsection}{Minimum testbench}
         ModelSim complains about the fact the testbench is empty, so let's begin by filling it up with the minimum code needed to compile. \\
 
         All VHDL files must have an \emph{entity}, so we must write one for this testbench. An entity represents the input and output ports of a component. This makes sense if the VHDL file is describing some RTL design, but it doesn't make much sense in the case of a testbench. Indeed, a testbench is not a ``component'' which will be used in a design, but merely a simple VHDL file which is used to provide inputs to, and monitor the outputs from a specific component \footnote{Note that the component to be tested is often called the \emph{Design Under Test (DUT)}.} (the combinatorial adder in this case). So the testbench essentially has an \emph{empty} entity.
 
-        \begin{minted}{vhdl}
-            entity tb_adder_combinatorial is
-            end tb_adder_combinatorial;
-        \end{minted}
-        \vspace{-1em}
-        \captionof{listing}{Minimum testbench (only empty entity) \\ \label{lst:combinatorial_minimum_testbench}}
+        \begin{lstlisting}[caption={Minimum testbench (only empty entity)}, captionpos=b, label={lst:combinatorial_minimum_testbench}]
+entity tb_adder_combinatorial is
+end tb_adder_combinatorial;
+        \end{lstlisting}
     \end{subsection}
 
     ModelSim should now successfully compile this testbench. \\
 
-    We would like to actually do something useful with the testbench, so we need to add an \emph{architecture}, as well as include the libraries containing various data types we are interested in manipulating (\texttt{std\_logic}, \texttt{std\_logic\_vector}, \texttt{integer}, \ldots).
+    We would like to actually do something useful with the testbench, so we need to add an \emph{architecture}, as well as include the libraries containing various data types we are interested in manipulating (\verb+std_logic+, \verb+std_logic_vector+, \verb+integer+, \ldots).
 
-    \begin{minted}{vhdl}
-        library ieee;
-        use ieee.std_logic_1164.all;
-        use ieee.numeric_std.all;
+    \begin{lstlisting}[caption={Add libraries \& empty architecture}, captionpos=b, label={lst:combinatorial_add_libraries_and_empty_architecture}]
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
-        entity tb_adder_combinatorial is
-        end tb_adder_combinatorial;
+entity tb_adder_combinatorial is
+end tb_adder_combinatorial;
 
-        architecture test of tb_adder_combinatorial is
-        begin
-        end architecture test;
-    \end{minted}
-    \vspace{-1em}
-    \captionof{listing}{Add libraries \& empty architecture \\ \label{lst:combinatorial_add_libraries_and_empty_architecture}}
+architecture test of tb_adder_combinatorial is
+begin
+end architecture test;
+    \end{lstlisting}
 
     \clearpage
 
     \begin{subsection}{Instantiating the DUT}
         In order to test a component, we must have access to it. So the next step is to take the DUT, instantiate it, and wire it into the testbench. After this step, we would be able to interact with the DUT as if it were a component in the ``design'' (although we are not designing anything here, just testing). \\
 
-        Wiring the DUT into the testbench requires information about its entity. The combinatorial adder's entity is presented in Listing~\ref{lst:adder_combinatorial_entity}. Note that the DUT is \emph{generic}: at instantiation time, the component can be configured with a specific width depending on the value provided in its \texttt{N\_BITS} parameter.
+        Wiring the DUT into the testbench requires information about its entity. The combinatorial adder's entity is presented in Listing~\ref{lst:adder_combinatorial_entity}. Note that the DUT is \emph{generic}: at instantiation time, the component can be configured with a specific width depending on the value provided in its \verb+N_BITS+ parameter.
 
-        \begin{minted}{vhdl}
-            entity adder_combinatorial is
-                generic(
-                    N_BITS : positive range 2 to positive'right  -- Operand size in bits
-                );
-                port(
-                    OP1 : in  std_logic_vector(N_BITS - 1 downto 0);  -- N-bit input.
-                    OP2 : in  std_logic_vector(N_BITS - 1 downto 0);  -- N-bit input.
-                    SUM : out std_logic_vector(N_BITS downto 0)  -- (N+1)-bit output.
-                );
-            end entity adder_combinatorial;
-        \end{minted}
-        \vspace{-1em}
-        \captionof{listing}{\texttt{adder\_combinatorial} entity \\ \label{lst:adder_combinatorial_entity}}
+        \begin{lstlisting}[caption={\texttt{adder\_combinatorial} entity}, captionpos=b, label={lst:adder_combinatorial_entity}]
+entity adder_combinatorial is
+    generic(
+        N_BITS : positive range 2 to positive'right  -- Operand size in bits
+    );
+    port(
+        OP1 : in  std_logic_vector(N_BITS - 1 downto 0);  -- N-bit input.
+        OP2 : in  std_logic_vector(N_BITS - 1 downto 0);  -- N-bit input.
+        SUM : out std_logic_vector(N_BITS downto 0)  -- (N+1)-bit output.
+    );
+end entity adder_combinatorial;
+        \end{lstlisting}
 
         We extract the relevant information from the DUT's entity and update the testbench \emph{architecture} as follows:
 
@@ -238,37 +213,35 @@
 
         Finally, we instantiate the DUT and wire it into the testbench with the signals created above.
 
-        \begin{minted}{vhdl}
-            library ieee;
-            use ieee.std_logic_1164.all;
-            use ieee.numeric_std.all;
+        \begin{lstlisting}[caption={Instantiate DUT}, captionpos=b, label={lst:combinatorial_instantiate_dut}]
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
-            entity tb_adder_combinatorial is
-            end tb_adder_combinatorial;
+entity tb_adder_combinatorial is
+end tb_adder_combinatorial;
 
-            architecture test of tb_adder_combinatorial is
+architecture test of tb_adder_combinatorial is
 
-                -- adder_combinatorial GENERICS
-                constant N_BITS : positive range 2 to positive'right := 4;
+    -- adder_combinatorial GENERICS
+    constant N_BITS : positive range 2 to positive'right := 4;
 
-                -- adder_combinatorial PORTS
-                signal OP1 : std_logic_vector(N_BITS - 1 downto 0);
-                signal OP2 : std_logic_vector(N_BITS - 1 downto 0);
-                signal SUM : std_logic_vector(N_BITS downto 0);
+    -- adder_combinatorial PORTS
+    signal OP1 : std_logic_vector(N_BITS - 1 downto 0);
+    signal OP2 : std_logic_vector(N_BITS - 1 downto 0);
+    signal SUM : std_logic_vector(N_BITS downto 0);
 
-            begin
+begin
 
-                -- Instantiate DUT
-                dut : entity work.adder_combinatorial
-                generic map(N_BITS => N_BITS)
-                port map(OP1 => OP1,
-                         OP2 => OP2,
-                         SUM => SUM);
+    -- Instantiate DUT
+    dut : entity work.adder_combinatorial
+    generic map(N_BITS => N_BITS)
+    port map(OP1 => OP1,
+             OP2 => OP2,
+             SUM => SUM);
 
-            end architecture test;
-        \end{minted}
-        \vspace{-1em}
-        \captionof{listing}{Instantiate DUT \\ \label{lst:combinatorial_instantiate_dut}}
+end architecture test;
+        \end{lstlisting}
     \end{subsection}
 
     \clearpage
@@ -280,81 +253,79 @@
             Let's go over what we are trying to achieve to see how to write the part of the testbench responsible for feeding data to the DUT. We would like to feed test vectors in \emph{sequence} to the unit, something like the execution below:
 
             \begin{enumerate}
-                \item Supply inputs OP1 and OP2 from vector 1.
-                \item Check output SUM from vector 1.
-                \item Supply inputs OP1 and OP2 from vector 2.
-                \item Check output SUM from vector 2.
+                \item Supply inputs \verb+OP1+ and \verb+OP2+ from vector 1.
+                \item Check output \verb+SUM+ from vector 1.
+                \item Supply inputs \verb+OP1+ and \verb+OP2+ from vector 2.
+                \item Check output \verb+SUM+ from vector 2.
                 \item \ldots
             \end{enumerate}
 
             In VHDL, recall that processes execute in parallel among each other, but the statements within each process execute in \emph{sequence}. This observation is key to writing the input-feeding part of the testbench: we can provide all inputs in a single process, separated by time intervals, and each vector will be executed one after the other until there no longer are any statements left in the process. It may be complicated to see why this works in words, so let's look at a concrete example to see how this all works.
 
-            \begin{minted}{vhdl}
-                library ieee;
-                use ieee.std_logic_1164.all;
-                use ieee.numeric_std.all;
+            \begin{lstlisting}[caption={Simulation process (basic)}, captionpos=b, label={lst:combinatorial_simulation_process_1_test_vector}]
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
-                entity tb_adder_combinatorial is
-                end tb_adder_combinatorial;
+entity tb_adder_combinatorial is
+end tb_adder_combinatorial;
 
-                architecture test of tb_adder_combinatorial is
+architecture test of tb_adder_combinatorial is
 
-                    -- "Time" that will elapse between test vectors we submit to the component.
-                    constant TIME_DELTA : time := 100 ns;
+    -- "Time" that will elapse between test vectors we submit to the component.
+    constant TIME_DELTA : time := 100 ns;
 
-                    -- adder_combinatorial GENERICS
-                    constant N_BITS : positive range 2 to positive'right := 4;
+    -- adder_combinatorial GENERICS
+    constant N_BITS : positive range 2 to positive'right := 4;
 
-                    -- adder_combinatorial PORTS
-                    signal OP1 : std_logic_vector(N_BITS - 1 downto 0);
-                    signal OP2 : std_logic_vector(N_BITS - 1 downto 0);
-                    signal SUM : std_logic_vector(N_BITS downto 0);
+    -- adder_combinatorial PORTS
+    signal OP1 : std_logic_vector(N_BITS - 1 downto 0);
+    signal OP2 : std_logic_vector(N_BITS - 1 downto 0);
+    signal SUM : std_logic_vector(N_BITS downto 0);
 
-                begin
+begin
 
-                    -- Instantiate DUT
-                    dut : entity work.adder_combinatorial
-                    generic map(N_BITS => N_BITS)
-                    port map(OP1 => OP1,
-                             OP2 => OP2,
-                             SUM => SUM);
+    -- Instantiate DUT
+    dut : entity work.adder_combinatorial
+    generic map(N_BITS => N_BITS)
+    port map(OP1 => OP1,
+             OP2 => OP2,
+             SUM => SUM);
 
-                    -- Test adder_combinatorial
-                    simulation : process
-                    begin
-                        -- Assign values to circuit inputs.
-                        OP1 <= "0001"; -- 1
-                        OP2 <= "0101"; -- 5
+    -- Test adder_combinatorial
+    simulation : process
+    begin
+        -- Assign values to circuit inputs.
+        OP1 <= "0001"; -- 1
+        OP2 <= "0101"; -- 5
 
-                        -- OP1 and OP2 are NOT yet assigned. We have to wait for some time
-                        -- for the simulator to "propagate" their values. Any infinitesimal
-                        -- period would work here since we are testing a combinatorial
-                        -- circuit.
-                        wait for TIME_DELTA;
+        -- OP1 and OP2 are NOT yet assigned. We have to wait for some time
+        -- for the simulator to "propagate" their values. Any infinitesimal
+        -- period would work here since we are testing a combinatorial
+        -- circuit.
+        wait for TIME_DELTA;
 
-                        -- Assign values to circuit inputs.
-                        OP1 <= "0011"; -- 3
-                        OP2 <= "0010"; -- 2
+        -- Assign values to circuit inputs.
+        OP1 <= "0011"; -- 3
+        OP2 <= "0010"; -- 2
 
-                        -- OP1 and OP2 are NOT yet assigned. We have to wait for some time
-                        -- for the simulator to "propagate" their values. Any infinitesimal
-                        -- period would work here since we are testing a combinatorial
-                        -- circuit.
-                        wait for TIME_DELTA;
-                    end process simulation;
+        -- OP1 and OP2 are NOT yet assigned. We have to wait for some time
+        -- for the simulator to "propagate" their values. Any infinitesimal
+        -- period would work here since we are testing a combinatorial
+        -- circuit.
+        wait for TIME_DELTA;
+    end process simulation;
 
-                end architecture test;
-            \end{minted}
-            \vspace{-1em}
-            \captionof{listing}{Simulation process (basic) \\ \label{lst:combinatorial_simulation_process_1_test_vector}}
+end architecture test;
+            \end{lstlisting}
         \end{subsubsection}
 
-        Notice that the process does \emph{not} have a sensitivity list. In VHDL, a process must either have a sensitivity list, or a \texttt{wait} statement. A testbench is not an RTL design, so it is not ``sensitive'' to any input signals. A testbench instead ``controls'' time to supply inputs at appropriate points, so the process contains 2 \texttt{wait} statements to propagate the 2 input vectors instead of a sensitivity list. \\
+        Notice that the process does \emph{not} have a sensitivity list. In VHDL, a process must either have a sensitivity list, or a \verb+wait+ statement. A testbench is not an RTL design, so it is not ``sensitive'' to any input signals. A testbench instead ``controls'' time to supply inputs at appropriate points, so the process contains 2 \verb+wait+ statements to propagate the 2 input vectors instead of a sensitivity list. \\
 
         Let's simulate our current testbench and see what we get.
 
         \begin{enumerate}
-            \item Click on the \includegraphics[height=12pt]{figs/compile_all_icon.png} icon to compile all sources. You should get something similar to Figure~\ref{fig:compiling_with_combinatorial_testbench}. Recall that the testbench for the sequential adder is not written yet, so it is normal it fails to compile.
+            \item Click on the \includegraphics[height=11pt]{figs/compile_all_icon.png} icon to compile all sources. You should get something similar to Figure~\ref{fig:compiling_with_combinatorial_testbench}. Recall that the testbench for the sequential adder is not written yet, so it is normal it fails to compile.
 
             \begin{figure}[!h]
                 \begin{centering}
@@ -364,9 +335,9 @@
                 \end{centering}
             \end{figure}
 
-            \item Go to \textit{\texttt{Simulate > Start Simulation...}}.
+            \item Go to \verb+Simulate > Start Simulation...+
 
-            \item Select \textit{\texttt{work > tb\_adder\_combinatorial}}, then press \textit{\texttt{OK}} (Figure~\ref{fig:start_tb_adder_combinatorial_simulation}).
+            \item Select \verb+work > tb_adder_combinatorial+, then press \verb+OK+ (Figure~\ref{fig:start_tb_adder_combinatorial_simulation}).
 
             \begin{figure}[!h]
                 \begin{centering}
@@ -376,7 +347,7 @@
                 \end{centering}
             \end{figure}
 
-            \item In the \textit{\texttt{sim}} tab, click on \texttt{tb\_adder\_combinatorial} (Figure~\ref{fig:sim_tab_tb_adder_combinatorial_simulation}).
+            \item In the \verb+sim+ tab, click on \verb+tb_adder_combinatorial+ (Figure~\ref{fig:sim_tab_tb_adder_combinatorial_simulation}).
 
             \begin{figure}[!h]
                 \begin{centering}
@@ -386,9 +357,9 @@
                 \end{centering}
             \end{figure}
 
-            \item Go to \textit{\texttt{Add > To Wave > All items in region}}.
+            \item Go to \verb+Add > To Wave > All items in region+.
 
-            \item Finally, in the simulation transcript, type \texttt{restart -f; run 600 ns;} (Figure~\ref{fig:waveform_combinatorial_transcript_basic_version}). A waveform window should appear with the result of the simulation (Figure~\ref{fig:waveform_combinatorial_process_reexecutes}).
+            \item Finally, in the simulation transcript, type \verb+restart -f; run 600 ns;+ (Figure~\ref{fig:waveform_combinatorial_transcript_basic_version}). A waveform window should appear with the result of the simulation (Figure~\ref{fig:waveform_combinatorial_process_reexecutes}).
 
             \begin{figure}[!h]
                 \begin{centering}
@@ -406,78 +377,78 @@
                 \end{centering}
             \end{figure}
 
-            The results look correct, i.e. $1 + 5 = 6$ and $3 + 2 = 5$, so at least the circuit is behaving correctly with these 2 input vectors. However, notice that the simulation is ``looping'' and is applying the two input vectors 3 times. Recall how processes work in VHDL. A process executes all its statements sequentially, then restarts. In the testbench, the simulation process uses 2 \texttt{wait} statements for a total of 200 ns of simulation time. Since we asked for a 600 ns simulation, the process had enough time to restart 3 times. \\
+            The results look correct, i.e. $1 + 5 = 6$ and $3 + 2 = 5$, so at least the circuit is behaving correctly with these 2 input vectors. However, notice that the simulation is ``looping'' and is applying the two input vectors 3 times. Recall how processes work in VHDL. A process executes all its statements sequentially, then restarts. In the testbench, the simulation process uses 2 \verb+wait+ statements for a total of \SI{200}{\nano\second} of simulation time. Since we asked for a \SI{600}{\nano\second} simulation, the process had enough time to restart 3 times. \\
         \end{enumerate}
 
         \clearpage
 
         \begin{subsubsection}{Automatic simulation termination}
-            In Figure~\ref{fig:waveform_combinatorial_transcript_basic_version}, we saw that we had to manually provide the simulation interval, 600 ns, to ModelSim. Manually selecting the time interval is error-prone, as one may accidentally supply an interval too short for all test vectors to pass through the DUT, or too long and unnecessarily re-executing test vectors which have already passed through the DUT. \\
+            In Figure~\ref{fig:waveform_combinatorial_transcript_basic_version}, we saw that we had to manually provide the simulation interval, \SI{600}{\nano\second}, to ModelSim. Manually selecting the time interval is error-prone, as one may accidentally supply an interval too short for all test vectors to pass through the DUT, or too long and unnecessarily re-executing test vectors which have already passed through the DUT. \\
 
-            It would be nice if the simulator could let the simulation run for as long as needed, i.e. until all test vectors have passed through the DUT, then automatically halt the simulation. ModelSim has a command specifically for this purpose: \texttt{run -all;}. Instead of specifying a time interval, the \texttt{``-all''} flag instructs ModelSim to continue simulating as long as events are scheduled for simulation. Therefore, one way to halt the simulation is to cause processes \emph{not} to restart once they have finished all their statements. This can be achieved by placing an \emph{indefinite} \texttt{wait} statement at the end of the simulation process, after all the test vectors have passed through the DUT.
+            It would be nice if the simulator could let the simulation run for as long as needed, i.e. until all test vectors have passed through the DUT, then automatically halt the simulation. ModelSim has a command specifically for this purpose: \verb+run -all+. Instead of specifying a time interval, the \verb+-all+ flag instructs ModelSim to continue simulating as long as events are scheduled for simulation. Therefore, one way to halt the simulation is to cause processes \emph{not} to restart once they have finished all their statements. This can be achieved by placing an \emph{indefinite} \verb+wait+ statement at the end of the simulation process, after all the test vectors have passed through the DUT.
 
-            \begin{minted}{vhdl}
-                library ieee;
-                use ieee.std_logic_1164.all;
-                use ieee.numeric_std.all;
+            \begin{lstlisting}[caption={Indefinite \texttt{wait} statement added to simulation process}, captionpos=b, label={lst:combinatorial_indefinite_wait_statement_added_to_simulation_process}]
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
-                entity tb_adder_combinatorial is
-                end tb_adder_combinatorial;
+entity tb_adder_combinatorial is
+end tb_adder_combinatorial;
 
-                architecture test of tb_adder_combinatorial is
+architecture test of tb_adder_combinatorial is
 
-                    -- "Time" that will elapse between test vectors we submit to the component.
-                    constant TIME_DELTA : time := 100 ns;
+    -- "Time" that will elapse between test vectors we submit to the component.
+    constant TIME_DELTA : time := 100 ns;
 
-                    -- adder_combinatorial GENERICS
-                    constant N_BITS : positive range 2 to positive'right := 4;
+    -- adder_combinatorial GENERICS
+    constant N_BITS : positive range 2 to positive'right := 4;
 
-                    -- adder_combinatorial PORTS
-                    signal OP1 : std_logic_vector(N_BITS - 1 downto 0);
-                    signal OP2 : std_logic_vector(N_BITS - 1 downto 0);
-                    signal SUM : std_logic_vector(N_BITS downto 0);
+    -- adder_combinatorial PORTS
+    signal OP1 : std_logic_vector(N_BITS - 1 downto 0);
+    signal OP2 : std_logic_vector(N_BITS - 1 downto 0);
+    signal SUM : std_logic_vector(N_BITS downto 0);
 
-                begin
+begin
 
-                    -- Instantiate DUT
-                    dut : entity work.adder_combinatorial
-                    generic map(N_BITS => N_BITS)
-                    port map(OP1 => OP1,
-                             OP2 => OP2,
-                             SUM => SUM);
+    -- Instantiate DUT
+    dut : entity work.adder_combinatorial
+    generic map(N_BITS => N_BITS)
+    port map(OP1 => OP1,
+             OP2 => OP2,
+             SUM => SUM);
 
-                    -- Test adder_combinatorial
-                    simulation : process
-                    begin
-                        -- Assign values to circuit inputs.
-                        OP1 <= "0001"; -- 1
-                        OP2 <= "0101"; -- 5
+    -- Test adder_combinatorial
+    simulation : process
+    begin
+        -- Assign values to circuit inputs.
+        OP1 <= "0001"; -- 1
+        OP2 <= "0101"; -- 5
 
-                        -- OP1 and OP2 are NOT yet assigned. We have to wait for some time
-                        -- for the simulator to "propagate" their values. Any infinitesimal
-                        -- period would work here since we are testing a combinatorial
-                        -- circuit.
-                        wait for TIME_DELTA;
+        -- OP1 and OP2 are NOT yet assigned. We have to wait for some time
+        -- for the simulator to "propagate" their values. Any infinitesimal
+        -- period would work here since we are testing a combinatorial
+        -- circuit.
+        wait for TIME_DELTA;
 
-                        -- Assign values to circuit inputs.
-                        OP1 <= "0011"; -- 3
-                        OP2 <= "0010"; -- 2
+        -- Assign values to circuit inputs.
+        OP1 <= "0011"; -- 3
+        OP2 <= "0010"; -- 2
 
-                        -- OP1 and OP2 are NOT yet assigned. We have to wait for some time
-                        -- for the simulator to "propagate" their values. Any infinitesimal
-                        -- period would work here since we are testing a combinatorial
-                        -- circuit.
-                        wait for TIME_DELTA;
+        -- OP1 and OP2 are NOT yet assigned. We have to wait for some time
+        -- for the simulator to "propagate" their values. Any infinitesimal
+        -- period would work here since we are testing a combinatorial
+        -- circuit.
+        wait for TIME_DELTA;
 
-                        -- Make this process wait indefinitely (it will never re-execute from
-                        -- its beginning again).
-                        wait;
-                    end process simulation;
+        -- Make this process wait indefinitely (it will never re-execute from
+        -- its beginning again).
+        wait;
+    end process simulation;
 
-                end architecture test;
-            \end{minted}
-            \vspace{-1em}
-            \captionof{listing}{Indefinite \texttt{wait} statement added to simulation process \\ \label{lst:combinatorial_indefinite_wait_statement_added_to_simulation_process}}
+end architecture test;
+            \end{lstlisting}
+
+            If we now recompile and relaunch the simulation, we should obtain the output shown in Figure~\ref{fig:waveform_combinatorial_process_automatically_terminates}.
 
             \begin{figure*}[!h]
                 \centering
@@ -501,80 +472,89 @@
         \clearpage
 
         \begin{subsubsection}{Avoiding code duplication}
-            Listing~\ref{lst:combinatorial_indefinite_wait_statement_added_to_simulation_process} is quite simple, but we can already see that there is a fair amount of code duplication going on. Every additional test vector requires copy-pasting the code responsible for the operand assignments and the \texttt{wait} statement. Although not exhaustive, we want to test the DUT with a potentially large number of test vectors to have more confidence in its correctness. However, a large number of test vectors would cause a huge increase in the simulation process' code size, therefore making it hard to read. \\
+            Listing~\ref{lst:combinatorial_indefinite_wait_statement_added_to_simulation_process} is quite simple, but we can already see that there is a fair amount of code duplication going on. Every additional test vector requires copy-pasting the code responsible for the operand assignments and the \verb+wait+ statement. Although not exhaustive, we want to test the DUT with a potentially large number of test vectors to have more confidence in its correctness. However, a large number of test vectors would cause a huge increase in the simulation process' code size, therefore making it hard to read. \\
 
-            We handle this issue by refactoring the code used to feed a test vector into a \emph{procedure} called \texttt{check\_add}. Notice the type of the input arguments provided to the \texttt{check\_add} procedure. We provide the operands in \texttt{natural} format instead of in \texttt{std\_logic\_vector}. This makes it easy to create \& add test vectors, and also makes the code more readable. \\
+            We handle this issue by refactoring the code used to feed a test vector into a \emph{procedure} called \verb+check_add+. Notice the type of the input arguments provided to the \verb+check_add+ procedure. We provide the operands in \verb+natural+ format instead of in \verb+std_logic_vector+. This makes it easy to create \& add test vectors, and also makes the code more readable. \\
 
             As a side-effect, we increased the count of test vectors from 2 to 10 for illustration purposes.
 
-            \begin{minted}{vhdl}
-                library ieee;
-                use ieee.std_logic_1164.all;
-                use ieee.numeric_std.all;
+            \begin{lstlisting}[caption={Refactored test vector feeding code into a \emph{procedure} called \texttt{check\_add}}, captionpos=b, label={lst:combinatorial_refactored_test_vector_feeding_code}]
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
-                entity tb_adder_combinatorial is
-                end tb_adder_combinatorial;
+entity tb_adder_combinatorial is
+end tb_adder_combinatorial;
 
-                architecture test of tb_adder_combinatorial is
+architecture test of tb_adder_combinatorial is
 
-                    -- "Time" that will elapse between test vectors we submit to the component.
-                    constant TIME_DELTA : time := 100 ns;
+    -- "Time" that will elapse between test vectors we submit to the component.
+    constant TIME_DELTA : time := 100 ns;
 
-                    -- adder_combinatorial GENERICS
-                    constant N_BITS : positive range 2 to positive'right := 4;
+    -- adder_combinatorial GENERICS
+    constant N_BITS : positive range 2 to positive'right := 4;
 
-                    -- adder_combinatorial PORTS
-                    signal OP1 : std_logic_vector(N_BITS - 1 downto 0);
-                    signal OP2 : std_logic_vector(N_BITS - 1 downto 0);
-                    signal SUM : std_logic_vector(N_BITS downto 0);
+    -- adder_combinatorial PORTS
+    signal OP1 : std_logic_vector(N_BITS - 1 downto 0);
+    signal OP2 : std_logic_vector(N_BITS - 1 downto 0);
+    signal SUM : std_logic_vector(N_BITS downto 0);
 
-                begin
-                    -- Instantiate DUT
-                    dut : entity work.adder_combinatorial
-                    generic map(N_BITS => N_BITS)
-                    port map(OP1 => OP1,
-                             OP2 => OP2,
-                             SUM => SUM);
+begin
+    -- Instantiate DUT
+    dut : entity work.adder_combinatorial
+    generic map(N_BITS => N_BITS)
+    port map(OP1 => OP1,
+             OP2 => OP2,
+             SUM => SUM);
 
-                    -- Test adder_combinatorial
-                    simulation : process
+    -- Test adder_combinatorial
+    simulation : process
 
-                        procedure check_add(constant in1 : in natural; constant in2 : in natural) is
-                        begin
-                            -- Assign values to circuit inputs.
-                            OP1 <= std_logic_vector(to_unsigned(in1, OP1'length));
-                            OP2 <= std_logic_vector(to_unsigned(in2, OP2'length));
+        procedure check_add(constant in1 : in natural;
+                            constant in2 : in natural) is
+        begin
+            -- Assign values to circuit inputs.
+            OP1 <= std_logic_vector(to_unsigned(in1, OP1'length));
+            OP2 <= std_logic_vector(to_unsigned(in2, OP2'length));
 
-                            -- OP1 and OP2 are NOT yet assigned. We have to wait for some time
-                            -- for the simulator to "propagate" their values. Any infinitesimal
-                            -- period would work here since we are testing a combinatorial
-                            -- circuit.
-                            wait for TIME_DELTA;
-                        end procedure check_add;
+            -- OP1 and OP2 are NOT yet assigned. We have to wait for some time
+            -- for the simulator to "propagate" their values. Any infinitesimal
+            -- period would work here since we are testing a combinatorial
+            -- circuit.
+            wait for TIME_DELTA;
+        end procedure check_add;
 
-                    begin
+    begin
 
-                        -- Check test vectors
-                        check_add(12, 8);
-                        check_add(10, 6);
-                        check_add(4, 1);
-                        check_add(11, 7);
-                        check_add(10, 13);
-                        check_add(8, 7);
-                        check_add(1, 9);
-                        check_add(7, 3);
-                        check_add(1, 4);
-                        check_add(8, 0);
+        -- Check test vectors
+        check_add(12, 8);
+        check_add(10, 6);
+        check_add(4, 1);
+        check_add(11, 7);
+        check_add(10, 13);
+        check_add(8, 7);
+        check_add(1, 9);
+        check_add(7, 3);
+        check_add(1, 4);
+        check_add(8, 0);
 
-                        -- Make this process wait indefinitely (it will never re-execute from
-                        -- its beginning again).
-                        wait;
-                    end process simulation;
+        -- Make this process wait indefinitely (it will never re-execute from
+        -- its beginning again).
+        wait;
+    end process simulation;
 
-                end architecture test;
-            \end{minted}
-            \vspace{-1em}
-            \captionof{listing}{Refactored test vector feeding code into a \emph{procedure} called \texttt{check\_add} \\ \label{lst:combinatorial_refactored_test_vector_feeding_code}}
+end architecture test;
+            \end{lstlisting}
+
+            Recompiling and relaunching the simulation (\verb+restart -f; run -all;+) results in a waveform with many more test vectors being shown (Figure~\ref{fig:waveform_combinatorial_process_avoid_code_duplication}).
+
+            \begin{figure}[!h]
+                \begin{centering}
+                    \includegraphics[width=1.0\textwidth]{figs/waveform_combinatorial_process_avoid_code_duplication.png}
+                    \caption{Waveform (many test vectors). Note that, by default, ModelSim displays signals in binary on a waveform. You can modify the display radix of various signals by selecting the signals and going to \texttt{Wave > Format > Radix}. The \texttt{Unsigned} radix is used in this waveform.}
+                    \label{fig:waveform_combinatorial_process_avoid_code_duplication}
+                \end{centering}
+            \end{figure}
         \end{subsubsection}
 
         \clearpage
@@ -584,94 +564,92 @@
 
             It would be great if the user could modify the definition of a test vector to not only include DUT inputs, but also its \emph{expected} output. We could then modify the testbench such that it automatically compares the output of the DUT with the expected output provided in the test vector. Nobody would then have to manually check the results for correctness. This type of testbench is commonly called a \emph{self-checking} testbench. We apply the idea in Listing~\ref{lst:combinatorial_self_checking_testbench}. \\
 
-            Notice how we use an assertion to compare the DUT output with the expected output provided in the test vector. The VHDL \texttt{assert} statement is followed by:
+            Notice how we use an assertion to compare the DUT output with the expected output provided in the test vector. The VHDL \verb+assert+ statement is followed by:
 
             \begin{enumerate}
-                \item A \texttt{report} statement and a string describing the error.
-                \item A \texttt{severity} statement and a severity level. VHDL supports 4 severity levels (note, warning, error, failure) and simulators can be configured to react to each severity level in different ways. We do not use this feature, but it is good to be aware of.
+                \item A \verb+report+ statement and a string describing the error.
+                \item A \verb+severity+ statement and a severity level. VHDL supports 4 severity levels (\verb+note+, \verb+warning+, \verb+error+, \verb+failure+) and simulators can be configured to react to each severity level in different ways. We do not use this feature, but it is good to be aware of.
             \end{enumerate}
 
-            \begin{minted}{vhdl}
-                library ieee;
-                use ieee.std_logic_1164.all;
-                use ieee.numeric_std.all;
+            \begin{lstlisting}[caption={Self-checking testbench: updated \texttt{check\_add} procedure to automatically compare DUT output against expected output provided in test vector}, captionpos=b, label={lst:combinatorial_self_checking_testbench}]
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
-                entity tb_adder_combinatorial is
-                end tb_adder_combinatorial;
+entity tb_adder_combinatorial is
+end tb_adder_combinatorial;
 
-                architecture test of tb_adder_combinatorial is
+architecture test of tb_adder_combinatorial is
 
-                    -- "Time" that will elapse between test vectors we submit to the component.
-                    constant TIME_DELTA : time := 100 ns;
+    -- "Time" that will elapse between test vectors we submit to the component.
+    constant TIME_DELTA : time := 100 ns;
 
-                    -- adder_combinatorial GENERICS
-                    constant N_BITS : positive range 2 to positive'right := 4;
+    -- adder_combinatorial GENERICS
+    constant N_BITS : positive range 2 to positive'right := 4;
 
-                    -- adder_combinatorial PORTS
-                    signal OP1 : std_logic_vector(N_BITS - 1 downto 0);
-                    signal OP2 : std_logic_vector(N_BITS - 1 downto 0);
-                    signal SUM : std_logic_vector(N_BITS downto 0);
+    -- adder_combinatorial PORTS
+    signal OP1 : std_logic_vector(N_BITS - 1 downto 0);
+    signal OP2 : std_logic_vector(N_BITS - 1 downto 0);
+    signal SUM : std_logic_vector(N_BITS downto 0);
 
-                begin
-                    -- Instantiate DUT
-                    dut : entity work.adder_combinatorial
-                    generic map(N_BITS => N_BITS)
-                    port map(OP1 => OP1,
-                             OP2 => OP2,
-                             SUM => SUM);
+begin
+    -- Instantiate DUT
+    dut : entity work.adder_combinatorial
+    generic map(N_BITS => N_BITS)
+    port map(OP1 => OP1,
+             OP2 => OP2,
+             SUM => SUM);
 
-                    -- Test adder_combinatorial
-                    simulation : process
+    -- Test adder_combinatorial
+    simulation : process
 
-                        procedure check_add(constant in1          : in natural;
-                                            constant in2          : in natural;
-                                            constant res_expected : in natural) is
-                            variable res : natural;
-                        begin
-                            -- Assign values to circuit inputs.
-                            OP1 <= std_logic_vector(to_unsigned(in1, OP1'length));
-                            OP2 <= std_logic_vector(to_unsigned(in2, OP2'length));
+        procedure check_add(constant in1          : in natural;
+                            constant in2          : in natural;
+                            constant res_expected : in natural) is
+            variable res : natural;
+        begin
+            -- Assign values to circuit inputs.
+            OP1 <= std_logic_vector(to_unsigned(in1, OP1'length));
+            OP2 <= std_logic_vector(to_unsigned(in2, OP2'length));
 
-                            -- OP1 and OP2 are NOT yet assigned. We have to wait for some time
-                            -- for the simulator to "propagate" their values. Any infinitesimal
-                            -- period would work here since we are testing a combinatorial
-                            -- circuit.
-                            wait for TIME_DELTA;
+            -- OP1 and OP2 are NOT yet assigned. We have to wait for some time
+            -- for the simulator to "propagate" their values. Any infinitesimal
+            -- period would work here since we are testing a combinatorial
+            -- circuit.
+            wait for TIME_DELTA;
 
-                            -- Check output against expected result.
-                            res := to_integer(unsigned(SUM));
-                            assert res = res_expected
-                            report "Unexpected result: " &
-                                   "OP1 = " & integer'image(in1) & "; " &
-                                   "OP2 = " & integer'image(in2) & "; " &
-                                   "SUM = " & integer'image(res) & "; " &
-                                   "SUM_expected = " & integer'image(res_expected)
-                            severity error;
-                        end procedure check_add;
+            -- Check output against expected result.
+            res := to_integer(unsigned(SUM));
+            assert res = res_expected
+            report "Unexpected result: " &
+                   "OP1 = " & integer'image(in1) & "; " &
+                   "OP2 = " & integer'image(in2) & "; " &
+                   "SUM = " & integer'image(res) & "; " &
+                   "SUM_expected = " & integer'image(res_expected)
+            severity error;
+        end procedure check_add;
 
-                    begin
+    begin
 
-                        -- Check test vectors against expected outputs
-                        check_add(12, 8, 20);
-                        check_add(10, 6, 16);
-                        check_add(4, 1, 5);
-                        check_add(11, 7, 18);
-                        check_add(10, 13, 23);
-                        check_add(8, 7, 15);
-                        check_add(1, 9, 10);
-                        check_add(7, 3, 10);
-                        check_add(1, 4, 5);
-                        check_add(8, 0, 8);
+        -- Check test vectors against expected outputs
+        check_add(12, 8, 20);
+        check_add(10, 6, 16);
+        check_add(4, 1, 5);
+        check_add(11, 7, 18);
+        check_add(10, 13, 23);
+        check_add(8, 7, 15);
+        check_add(1, 9, 10);
+        check_add(7, 3, 10);
+        check_add(1, 4, 5);
+        check_add(8, 0, 8);
 
-                        -- Make this process wait indefinitely (it will never re-execute from
-                        -- its beginning again).
-                        wait;
-                    end process simulation;
+        -- Make this process wait indefinitely (it will never re-execute from
+        -- its beginning again).
+        wait;
+    end process simulation;
 
-                end architecture test;
-            \end{minted}
-            \vspace{-1em}
-            \captionof{listing}{Self-checking testbench: updated \texttt{check\_add} procedure to automatically compare DUT output against expected output provided in test vector \\ \label{lst:combinatorial_self_checking_testbench}}
+end architecture test;
+            \end{lstlisting}
         \end{subsubsection}
     \end{subsection}
 \end{section}
@@ -682,4 +660,5 @@
 TODO
 \end{section}
 
+%=============================================================================
 \end{document}
