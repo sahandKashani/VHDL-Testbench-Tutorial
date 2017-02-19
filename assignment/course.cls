@@ -161,10 +161,10 @@
 \RequirePackage{fancyhdr}
 \RequirePackage{lastpage}
 \RequirePackage{textcomp}
-\RequirePackage{color}
+\RequirePackage{xcolor}
 \RequirePackage{listings}
 \RequirePackage{multirow}
-\RequirePackage{ctable}
+%\RequirePackage{ctable}
 \RequirePackage{array}
 
 %=============================================================================
@@ -215,7 +215,7 @@
     \fancyhead{}
     \fancyfoot{}
     \fancyfoot[LO,RE]{\headerstyle{%
-      Version \rcsInfoRevision\ of \rcsInfoLongDate, 
+      Version \rcsInfoRevision\ of \rcsInfoLongDate,
       EPFL \copyright \rcsInfoYear}}
     \fancyfoot[RO,LE]{\headerstyle{%
     \thepage\ of \pageref{LastPage}}}
@@ -228,7 +228,7 @@
       \@title}}
     \fancyfoot{}
     \fancyfoot[LO,RE]{\headerstyle{%
-      Version \rcsInfoRevision\ of \rcsInfoLongDate, 
+      Version \rcsInfoRevision\ of \rcsInfoLongDate,
       EPFL \copyright \rcsInfoYear}}
     \fancyfoot[RO,LE]{\headerstyle{%
     \thepage\ of \pageref{LastPage}}}
@@ -270,7 +270,7 @@
     \fancyhead{}
     \fancyfoot{}
     \fancyfoot[LO,RE]{\headerstyle{%
-      Version \rcsInfoRevision\ of \rcsInfoLongDate, 
+      Version \rcsInfoRevision\ of \rcsInfoLongDate,
       EPFL \copyright \rcsInfoYear}}
     \fancyfoot[RO,LE]{\headerstyle{%
     \thepage\ of \pageref{LastPage}}}
@@ -284,7 +284,7 @@
     \fancyhead[LO,RE]{\headerstyle{\@type\ \arabic{exercise} \\ \@chapter}}
     \fancyfoot{}
     \fancyfoot[LO,RE]{\headerstyle{%
-      Version \rcsInfoRevision\ of \rcsInfoLongDate, 
+      Version \rcsInfoRevision\ of \rcsInfoLongDate,
       EPFL \copyright \rcsInfoYear}}
     \fancyfoot[RO,LE]{\headerstyle{%
     \thepage\ of \pageref{LastPage}}}
@@ -311,7 +311,7 @@
   \def\@createdby{}
   \def\modifiedby#1{\gdef\@modifiedby{#1}}
   \def\@modifiedby{}
-        
+
   \renewcommand{\maketitle}{\par
     \begingroup
       \renewcommand\thefootnote{\@fnsymbol\c@footnote}%
@@ -390,7 +390,7 @@
 % Exam title
 \if@exam
   \def\subtitle#1{\gdef\@subtitle{#1}}
-  \def\@subtitle{\@latex@error{No \noexpand\subtitle given}\@ehc} 
+  \def\@subtitle{\@latex@error{No \noexpand\subtitle given}\@ehc}
   \renewcommand{\maketitle}{\par
     \begingroup
       \renewcommand\thefootnote{\@fnsymbol\c@footnote}%
@@ -460,14 +460,14 @@
 \if@book
 	\def\title#1{\gdef\@mytitle{#1}\gdef\@title{#1}}%very ugly hack (as \@title not accessible in the header)
   \def\subtitle#1{\gdef\@subtitle{#1}}
-  
+
   \def\@maketitle{%
-  	
+
     \newpage
     \null
     \thispagestyle{empty}
     %\noindent {\Huge \textbf{\textsf{\@title}} \par}%
-    
+
     \begin{center}
 			\large
 			\includegraphics[width=6cm]{figs/EPFL_logo.pdf}
@@ -475,12 +475,12 @@
 			\vspace{2cm}
 			\Huge \textbf{\textsf{\@title}} \par%
 			\vspace{1.5cm}
-			
+
 			\Large \textbf{\textsf{\@subtitle}}%
-			
+
 			\vspace{2cm}
 			\@date
-			
+
 			\vspace{2cm}
 			\normalsize
 			Paolo \textsc{Ienne}, Xavier \textsc{Jimenez}, et al.  \\
@@ -488,7 +488,7 @@
 			\includegraphics[width=2cm]{figs/logo_lap.png}
 		\end{center}
     \newpage
-    
+
 }
 \fi
 %=============================================================================
@@ -527,15 +527,15 @@
 		\setcounter{question}{0}%reset the question counter for each new exercise
 		\setcounter{equation}{0}
 	}
-	
+
 	\newcommand{\question}{
 		\refstepcounter{question}%
 		\vspace{0.3cm}%
 		{\noindent\normalfont\normalsize\bfseries\sffamily\alph{question})}
 	}
-	
+
 	\renewcommand{\thequestion}{{\normalfont\normalsize\bfseries\sffamily\alph{question})}}
-	
+
   \renewcommand{\section}{%
     \@startsection {section}{1}{\z@}%
     {-3.5ex \@plus -1ex \@minus -.2ex}%
@@ -548,10 +548,10 @@
 
 		\newcounter{chapter}%counter that keeps track of the chapter numbering
 		\newcounter{exercise}[chapter]%counter to number exercises. It is reset whenever exercise is incremented
-%		
+%
 		\newcounter{question}%counter to number the questions within an exercise as well as answers in the solution
 		\newcounter{subquestion}[question]%subquestion numbering, is reset for each new question
-%		
+%
 	\newcommand{\exercise}[1]{
 		\ifnum\value{exercise}>0 \clearpage%
 		\fi%
@@ -561,18 +561,18 @@
 		\vspace{0.3cm}%
 		\noindent%
 		{\normalfont\large\bfseries\sffamily  [Exercise \arabic{exercise}] #1}%newline
-		
+
 		\vspace{0.5cm}
 		\setcounter{question}{0}%reset the question counter for each new exercise
 		\setcounter{equation}{0}
 	}
-%	
+%
 	\newcommand{\solution}[1]{
 		\clearpage%
 		\def\@type{Solution}%
 		\noindent%
 		{\normalfont\large\bfseries\sffamily [Solution \arabic{exercise}] #1}%newline
-		
+
 		\vspace{0.5cm}%
 		\setcounter{question}{0}%
 	}
@@ -606,7 +606,7 @@
 		\input{#1/solution}
 		\fi
 	}
-	
+
 \fi
 %=============================================================================
 
@@ -710,10 +710,10 @@
                          zero, at, a0, a1, a2, a3, v0 ,v1,
                          t0, t1, t2, t3, t4, t5, t6, t7,
                          s0, s1, s2, s3, s4, s5, s6, s7,
-                         et, bt, gp, sp, fp, ea, ba, ra, 
-                         r0, r1, r2, r3, r4, r5, r6, r7, 
-                         r8, r9, r10, r11, r12, r13, r14, r15, 
-                         r16, r17, r18, r19, r20, r21, r22, r23, 
+                         et, bt, gp, sp, fp, ea, ba, ra,
+                         r0, r1, r2, r3, r4, r5, r6, r7,
+                         r8, r9, r10, r11, r12, r13, r14, r15,
+                         r16, r17, r18, r19, r20, r21, r22, r23,
                          r24, r25, r26, r27, r28, r29, r30, r31,
                          status, estatus, ienable, ipending, cpuid, %control registers
                          rA, rB, rC, ctlN}, % for symbolic presentation
@@ -760,10 +760,10 @@
                          $zero, $at, $a0, $a1, $a2, $a3, $v0 ,$v1,
                          $t0, $t1, $t2, $t3, $t4, $t5, $t6, $t7,
                          $s0, $s1, $s2, $s3, $s4, $s5, $s6, $s7,
-                         $t8, $t9, $k0, $k1, $gp, $sp, $fp, $ra, 
-                         $0, $1, $2, $3, $4, $5, $6, $7, 
-                         $8, $9, $10, $11, $12, $13, $14, $15, 
-                         $16, $17, $18, $19, $20, $21, $22, $23, 
+                         $t8, $t9, $k0, $k1, $gp, $sp, $fp, $ra,
+                         $0, $1, $2, $3, $4, $5, $6, $7,
+                         $8, $9, $10, $11, $12, $13, $14, $15,
+                         $16, $17, $18, $19, $20, $21, $22, $23,
                          $24, $25, $26, $27, $28, $29, $30, $31},
         basicstyle={\ttfamily}, % default style
         keywordstyle={\bfseries\color{instrcolor}}, % style for instructions
@@ -813,10 +813,10 @@
                          zero, at, a0, a1, a2, a3, v0 ,v1,
                          t0, t1, t2, t3, t4, t5, t6, t7,
                          s0, s1, s2, s3, s4, s5, s6, s7,
-                         et, bt, gp, sp, fp, ea, ba, ra, 
-                         r0, r1, r2, r3, r4, r5, r6, r7, 
-                         r8, r9, r10, r11, r12, r13, r14, r15, 
-                         r16, r17, r18, r19, r20, r21, r22, r23, 
+                         et, bt, gp, sp, fp, ea, ba, ra,
+                         r0, r1, r2, r3, r4, r5, r6, r7,
+                         r8, r9, r10, r11, r12, r13, r14, r15,
+                         r16, r17, r18, r19, r20, r21, r22, r23,
                          r24, r25, r26, r27, r28, r29, r30, r31,
                          rA, rB, rC}, % for symbolic presentation
         basicstyle={\ttfamily}, % default style
@@ -834,13 +834,13 @@
         }
 %=============================================================================
 %
-% Macros to switch between languages 
+% Macros to switch between languages
 %
 
 % Nios2
 \newcommand{\lstNios}{
 	\lstset{language=nios2}}
-	
+
 % VHDL with some style definition
 \newcommand{\lstVHDL}{
 	\lstset{language=VHDL,
