@@ -14,6 +14,7 @@
 
 \lstset{language=VHDL}
 \lstset{showstringspaces=false}
+\lstset{captionpos=b}
 
 \setlength\parindent{0pt}
 
@@ -164,7 +165,7 @@
 
         All VHDL files must have an \emph{entity}, so we must write one for this testbench. An entity represents the input and output ports of a component. This makes sense if the VHDL file is describing some RTL design, but it doesn't make much sense in the case of a testbench. Indeed, a testbench is not a ``component'' which will be used in a design, but merely a simple VHDL file which is used to provide inputs to, and monitor the outputs from the DUT (the combinatorial adder in this case). So the testbench essentially has an \emph{empty} entity.
 
-        \begin{lstlisting}[caption={Minimum testbench (only empty entity)}, captionpos=b, label={lst:combinatorial_minimum_testbench}]
+        \begin{lstlisting}[caption={Minimum testbench (only empty entity)}, label={lst:combinatorial_minimum_testbench}]
 entity tb_adder_combinatorial is
 end tb_adder_combinatorial;
         \end{lstlisting}
@@ -174,7 +175,7 @@ end tb_adder_combinatorial;
 
     We would like to actually do something useful with the testbench, so we need to add an \emph{architecture}, as well as include the libraries containing various data types we are interested in manipulating (\verb+std_logic+, \verb+std_logic_vector+, \verb+integer+, \ldots).
 
-    \begin{lstlisting}[caption={Add libraries \& empty architecture}, captionpos=b, label={lst:combinatorial_add_libraries_and_empty_architecture}]
+    \begin{lstlisting}[caption={Add libraries \& empty architecture}, label={lst:combinatorial_add_libraries_and_empty_architecture}]
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -195,7 +196,7 @@ end architecture test;
 
         Wiring the DUT into the testbench requires information about its entity. The combinatorial adder's entity is presented in Listing~\ref{lst:adder_combinatorial_entity}. Note that the DUT is \emph{generic}: at instantiation time, the component can be configured with a specific width depending on the value provided in its \verb+N_BITS+ parameter.
 
-        \begin{lstlisting}[caption={\texttt{adder\_combinatorial} entity}, captionpos=b, label={lst:adder_combinatorial_entity}]
+        \begin{lstlisting}[caption={\texttt{adder\_combinatorial} entity}, label={lst:adder_combinatorial_entity}]
 entity adder_combinatorial is
     generic(
         N_BITS : positive range 2 to positive'right  -- Operand size in bits
@@ -217,7 +218,7 @@ end entity adder_combinatorial;
 
         Finally, we instantiate the DUT and wire it into the testbench with the signals created above.
 
-        \begin{lstlisting}[caption={Instantiate DUT}, captionpos=b, label={lst:combinatorial_instantiate_dut}]
+        \begin{lstlisting}[caption={Instantiate DUT}, label={lst:combinatorial_instantiate_dut}]
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -267,7 +268,7 @@ end architecture test;
 
             In VHDL, recall that processes execute in \emph{parallel} among each other, but the statements within each process execute in \emph{sequence}. This observation is key to writing the input-feeding part of the testbench: we can provide all inputs in a single process, separated by time intervals, and each vector will be executed one after the other until there no longer are any statements left in the process. It may be complicated to see why this works in words, so let's look at a concrete example to see how this all works.
 
-            \begin{lstlisting}[caption={Simulation process (basic)}, captionpos=b, label={lst:combinatorial_simulation_process_1_test_vector}]
+            \begin{lstlisting}[caption={Simulation process (basic)}, label={lst:combinatorial_simulation_process_1_test_vector}]
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -392,7 +393,7 @@ end architecture test;
 
             It would be nice if the simulator could let the simulation run for as long as needed, i.e. until all test vectors have passed through the DUT, then automatically halt the simulation. ModelSim has a command specifically for this purpose: \verb+run -all+. Instead of specifying a time interval, the \verb+-all+ flag instructs ModelSim to continue simulating as long as events are scheduled for simulation. Therefore, one way to halt the simulation is to cause processes \emph{not} to restart once they have finished all their statements. This can be achieved by placing an \emph{indefinite} \verb+wait+ statement at the end of the simulation process, after all the test vectors have passed through the DUT.
 
-            \begin{lstlisting}[caption={Indefinite \texttt{wait} statement added to simulation process}, captionpos=b, label={lst:combinatorial_indefinite_wait_statement_added_to_simulation_process}]
+            \begin{lstlisting}[caption={Indefinite \texttt{wait} statement added to simulation process}, label={lst:combinatorial_indefinite_wait_statement_added_to_simulation_process}]
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -460,17 +461,17 @@ end architecture test;
                 \begin{subfigure}[t]{0.4\textwidth}
                     \centering
                     \includegraphics[width=1.0\textwidth]{figs/waveform_combinatorial_transcript_automatic_termination.png}
-                    \caption{Transcript (automatic termination)}
+                    \caption{Transcript}
                     \label{fig:waveform_combinatorial_transcript_automatically_terminates}
                 \end{subfigure}
                 \hspace{1em}
                 \begin{subfigure}[t]{0.55\textwidth}
                     \centering
                     \includegraphics[width=1.0\textwidth]{figs/waveform_combinatorial_process_automatic_termination.png}
-                    \caption{Waveform (automatic termination)}
+                    \caption{Waveform}
                     \label{fig:waveform_combinatorial_process_automatically_terminates}
                 \end{subfigure}
-                \caption{ModelSim project creation}
+                \caption{Automatic simulation termination}
             \end{figure*}
         \end{subsubsection}
 
@@ -483,7 +484,7 @@ end architecture test;
 
             As a side-effect, we increased the count of test vectors from 2 to 10 for illustration purposes.
 
-            \begin{lstlisting}[caption={Refactored test vector feeding code into a \emph{procedure} called \texttt{check\_add}}, captionpos=b, label={lst:combinatorial_refactored_test_vector_feeding_code}]
+            \begin{lstlisting}[caption={Refactored test vector feeding code into a \emph{procedure} called \texttt{check\_add}}, label={lst:combinatorial_refactored_test_vector_feeding_code}]
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -577,7 +578,7 @@ end architecture test;
                 \item A \verb+severity+ statement and a severity level. VHDL supports 4 severity levels (\verb+note+, \verb+warning+, \verb+error+, \verb+failure+) and simulators can be configured to react to each severity level in different ways. We do not use this feature, but it is good to be aware of.
             \end{enumerate}
 
-            \begin{lstlisting}[caption={Self-checking testbench: updated \texttt{check\_add} procedure to automatically compare DUT output against expected output provided in test vector}, captionpos=b, label={lst:combinatorial_self_checking_testbench}]
+            \begin{lstlisting}[caption={Self-checking testbench: updated \texttt{check\_add} procedure to automatically compare DUT output against expected output provided in test vector}, label={lst:combinatorial_self_checking_testbench}]
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -668,7 +669,7 @@ end architecture test;
     \begin{subsection}{Instantiating the DUT}
         Let's start by instantiating the DUT and wiring it into the testbench. We use the same algorithm described in Section~\ref{sec:combinatorial_instantiating_dut} to obtain Listing~\ref{lst:sequential_instantiate_dut}.
 
-        \begin{lstlisting}[caption={Instantiate DUT}, captionpos=b, label={lst:sequential_instantiate_dut}]
+        \begin{lstlisting}[caption={Instantiate DUT}, label={lst:sequential_instantiate_dut}]
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -712,7 +713,7 @@ end architecture test;
     \begin{subsection}{Generating a clock signal}
         The sequential adder is a synchronous component as it is sensitive to a clock. We saw in Section~\ref{sec:combinatorial_basic_input_feeding} that, for simulation purposes, one can assign values to signals by using a VHDL process. We do the same in Listing~\ref{lst:sequential_process_generate_clk} specifically for generating the \verb+CLK+ input of the DUT.
 
-        \begin{lstlisting}[caption={Add process for generating \texttt{CLK} signal}, captionpos=b, label={lst:sequential_process_generate_clk}]
+        \begin{lstlisting}[caption={Add process for generating \texttt{CLK} signal}, label={lst:sequential_process_generate_clk}]
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -777,7 +778,7 @@ end architecture test;
 
             Therefore, we update our testbench with a second process called \verb+simulation+ which is responsible for generating the non-clock inputs of the DUT. Our first attempt is shown in Listing~\ref{lst:sequential_process_simulation_default_values} where the testbench just assigns default values to the DUT's non-clock signals.
 
-            \begin{lstlisting}[caption={Add \texttt{simulation} process for generating non-clock signals to the DUT. This first version only assigns default values to the non-clock signals.}, captionpos=b, label={lst:sequential_process_simulation_default_values}]
+            \begin{lstlisting}[caption={Add \texttt{simulation} process for generating non-clock signals to the DUT. This first version only assigns default values to the non-clock signals.}, label={lst:sequential_process_simulation_default_values}]
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -841,7 +842,7 @@ end architecture test;
         \begin{subsubsection}{Resetting the DUT}
             The DUT is a synchronous circuit and has an \emph{asynchronous} reset input, verb+RST+. When testing a component, it is a good practice to supply it with a reset pulse before feeding it any other inputs. This guarantees the DUT is in a valid state before we do anything. We update the \verb+simulation+ process with an \verb+async_reset+ \emph{procedure} for this.
 
-            \begin{lstlisting}[caption={Add \emph{asynchronous} reset}, captionpos=b, label={lst:sequential_process_simulation_async_reset}]
+            \begin{lstlisting}[caption={Add \emph{asynchronous} reset}, label={lst:sequential_process_simulation_async_reset}]
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -921,7 +922,7 @@ end architecture test;
 
             Now that the DUT is in a valid initial state, we can start feeding it test vectors and automatically check if the output is correct. We create a \verb+check_add+ \emph{procedure} for this purpose, similarly as for the combinatorial adder.
 
-            \begin{lstlisting}[caption={Add test vectors}, captionpos=b, label={lst:sequential_process_simulation_test_vectors}]
+            \begin{lstlisting}[caption={Add test vectors}, label={lst:sequential_process_simulation_test_vectors}]
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -1116,11 +1117,175 @@ end architecture test;
                 However, we suffer from the ``loopy'' execution of the \verb+simulation+ process again, as was previously seen for the combinatorial adder. We will address this issue next so we can take advantage of ModelSim's practical automatic simulation termination command, \verb+run -all+.
             \end{enumerate}
         \end{subsubsection}
+
+        \begin{subsubsection}{Automatic simulation termination}
+            For the combinatorial adder, we saw how to stop a process from re-executing by means of an \emph{indefinite} \verb+wait+ statement. We would like to use the same technique to automatically halt the simulation with ModelSim's \verb+run -all+ command once all test vectors have gone through the DUT. Unfortunately, unlike for the combinatorial adder, simply adding an indefinite \verb+wait+ statement to the \verb+simulation+ process will not be sufficient for the simulation to automatically terminate. \\
+
+            Recall the semantics of the \verb+run -all+ command: ModelSim terminates the simulation when there no longer exists any scheduled signal assignment in the testbench. If we add an indefinite \verb+wait+ statement to the \verb+simulation+ process, then this process will indeed never re-execute, causing our test vectors to only go through the DUT once (which is what we are looking for). However, the \verb+clk_generation+ process still keeps restarting, so there always will be scheduled signal assignments in the testbench. The end result is that the \verb+run -all+ command will never stop the simulation! \\
+
+            To address this issue, we would need the \verb+clk_generation+ process to also stop scheduling any new signal assignments once all test vectors have gone through the DUT in the \verb+simulation+ process. We can achieve this by introducing a boolean \verb+sim_finished+ signal. The \verb+sim_finished+ signal is written by the \verb+simulation+ process once all test vectors have gone through the DUT, and is continuously read by the \verb+clk_generation+ process to know when to stop scheduling any new signal assignments. If the \verb+sim_finished+ signal is \verb+true+, then we can use an indefinite \verb+wait+ statement in both processes to avoid any new signal assignments from occuring, therefore allowing ModelSim to automatically terminate the simulation. \\
+
+            Listing~\ref{lst:sequential_process_simulation_automatic_termination} shows how to use this technique.
+
+            \begin{lstlisting}[caption={Automatic simulation termination}, label={lst:sequential_process_simulation_automatic_termination}]
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity tb_adder_sequential is
+end tb_adder_sequential;
+
+architecture test of tb_adder_sequential is
+
+    constant CLK_PERIOD : time := 100 ns;
+
+    -- Signal used to end simulator when we finished submitting our test cases
+    signal sim_finished : boolean := false;
+
+    -- adder_sequential GENERICS
+    constant N_BITS : positive range 2 to positive'right := 4;
+
+    -- adder_sequential PORTS
+    signal CLK   : std_logic;
+    signal RST   : std_logic;
+    signal START : std_logic;
+    signal OP1   : std_logic_vector(N_BITS - 1 downto 0);
+    signal OP2   : std_logic_vector(N_BITS - 1 downto 0);
+    signal SUM   : std_logic_vector(N_BITS downto 0);
+    signal DONE  : std_logic;
+
+begin
+
+    -- Instantiate DUT
+    dut : entity work.adder_sequential
+    generic map(N_BITS => N_BITS)
+    port map(CLK   => CLK,
+             RST   => RST,
+             START => START,
+             OP1   => OP1,
+             OP2   => OP2,
+             SUM   => SUM,
+             DONE  => DONE);
+
+    -- Generate CLK signal
+    clk_generation : process
+    begin
+        if not sim_finished then
+            clk <= '1';
+            wait for CLK_PERIOD / 2;
+            clk <= '0';
+            wait for CLK_PERIOD / 2;
+        else
+            wait;
+        end if;
+    end process clk_generation;
+
+    -- Test adder_sequential
+    simulation : process
+
+        procedure async_reset is
+        begin
+            wait until rising_edge(CLK);
+            wait for CLK_PERIOD / 4;
+            RST <= '1';
+
+            wait for CLK_PERIOD / 2;
+            RST <= '0';
+        end procedure async_reset;
+
+        procedure check_add(constant in1          : in natural;
+                            constant in2          : in natural;
+                            constant res_expected : in natural) is
+            variable res : natural;
+        begin
+            -- Our circuit is sensitive to the rising edge of the CLK, so we
+            -- need to be sure to assign signal values such that they are stable
+            -- at the next rising edge of the CLK.
+            wait until rising_edge(CLK);
+
+            -- Assign values to circuit inputs.
+            OP1   <= std_logic_vector(to_unsigned(in1, OP1'length));
+            OP2   <= std_logic_vector(to_unsigned(in2, OP2'length));
+            START <= '1';
+
+            -- OP1, OP2 and START are NOT yet assigned. We have to wait for some
+            -- time for the simulator to "propagate" their values. Any
+            -- infinitesimal period would work for the simulator to "propagate"
+            -- the values. However, our circuit is a sequential circuit
+            -- sensitive to the rising edge of CLK, so we need to hold our
+            -- signal assignments until the next rising edge of CLK so the
+            -- circuit can see them.
+            wait until rising_edge(CLK);
+
+            -- Remove values from circuit inputs. The circuit works with a PULSE
+            -- on its START input, which means that data on the inputs only
+            -- needs to be valid when START is high.
+            OP1   <= (others => '0');
+            OP2   <= (others => '0');
+            START <= '0';
+
+            -- The circuit informs us it has finished by asserting DONE, so we
+            -- can wait until we receive the signal before proceeding. DONE is
+            -- asserted at the rising edge of CLK, so we (the test system) can
+            -- sample the data and check its correctness.
+            wait until DONE = '1';
+
+            -- Check output against expected result.
+            res := to_integer(unsigned(SUM));
+            assert res = res_expected
+            report "Unexpected result: " &
+                   "OP1 = " & integer'image(in1) & "; " &
+                   "OP2 = " & integer'image(in2) & "; " &
+                   "SUM = " & integer'image(res) & "; " &
+                   "SUM_expected = " & integer'image(res_expected)
+            severity error;
+
+            -- Wait for the circuit to go back into the IDLE state.
+            wait until DONE = '0';
+        end procedure check_add;
+
+    begin
+
+        -- Default values
+        OP1   <= (others => '0');
+        OP2   <= (others => '0');
+        RST   <= '0';
+        START <= '0';
+        wait for CLK_PERIOD;
+
+        -- Reset the circuit.
+        async_reset;
+
+        -- Check test vectors against expected outputs
+        check_add(12, 8, 20);
+        check_add(10, 6, 16);
+        check_add(4, 1, 5);
+        check_add(11, 7, 18);
+
+        -- Instruct "clk_generation" process to halt execution.
+        sim_finished <= true;
+
+        -- Make this process wait indefinitely (it will never re-execute from
+        -- its beginning again).
+        wait;
+    end process simulation;
+
+end architecture test;
+            \end{lstlisting}
+
+            Finally, compiling (\includegraphics[height=11pt]{figs/compile_all_icon.png}) and simulating (\verb+restart -f; run -all;+) the code shown in Listing~\ref{lst:sequential_process_simulation_automatic_termination} should yield the waveform shown in Figure~\ref{fig:waveform_sequential_process_automatically_terminates}. Note that only 4 test vectors are shown here to prevent the figure from becoming too small and illegible.
+
+            \begin{figure}[!h]
+                \begin{centering}
+                    \includegraphics[width=\textwidth]{figs/waveform_sequential_process_automatic_termination.png}
+                    \caption{Automatic termination}
+                    \label{fig:waveform_sequential_process_automatically_terminates}
+                \end{centering}
+            \end{figure}
+
+        \end{subsubsection}
     \end{subsection}
 
-    \begin{subsection}{Automatic simulation termination}
-        For the combinatorial adder, we saw how to stop a process from re-executing by means of an \emph{indefinite} \verb+wait+ statement. We would like to use the same technique to automatically halt the simulation once all test vectors have gone through the DUT.
-    \end{subsection}
 \end{section}
 
 %=============================================================================
