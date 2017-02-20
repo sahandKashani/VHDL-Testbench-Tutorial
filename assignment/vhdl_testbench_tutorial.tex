@@ -867,7 +867,7 @@ end architecture test;
         \end{subsubsection}
 
         \begin{subsubsection}{Resetting the DUT}
-            The DUT is a synchronous circuit and has an \emph{asynchronous} reset input, verb+RST+. When testing a component, it is a good practice to supply it with a reset pulse before feeding it any other inputs. This guarantees the DUT is in a valid state before we do anything. We update the \verb+simulation+ process with an \verb+async_reset+ \emph{procedure} for this.
+            The DUT is a synchronous circuit and has an \emph{asynchronous} reset input, \verb+RST+. When testing a component, it is a good practice to supply it with a reset pulse before feeding it any other inputs. This guarantees the DUT is in a valid state before we do anything. We update the \verb+simulation+ process with an \verb+async_reset+ \emph{procedure} for this.
 
             \begin{lstlisting}[caption={Add \emph{asynchronous} reset}, label={lst:sequential_process_simulation_async_reset}]
 library ieee;
