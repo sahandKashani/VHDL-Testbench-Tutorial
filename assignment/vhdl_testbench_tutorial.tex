@@ -638,8 +638,8 @@ begin
 
         procedure check_add(constant in1          : in natural;
                             constant in2          : in natural;
-                            constant res_expected : in natural) is
-            variable res : natural;
+                            @constant res_expected : in natural@) is
+            @variable res : natural;@
         begin
             -- Assign values to circuit inputs.
             OP1 <= std_logic_vector(to_unsigned(in1, OP1'length));
@@ -665,16 +665,16 @@ begin
     begin
 
         -- Check test vectors against expected outputs
-        check_add(12, 8, 20);
-        check_add(10, 6, 16);
-        check_add(4, 1, 5);
-        check_add(11, 7, 18);
-        check_add(10, 13, 23);
-        check_add(8, 7, 15);
-        check_add(1, 9, 10);
-        check_add(7, 3, 10);
-        check_add(1, 4, 5);
-        check_add(8, 0, 8);
+        check_add(12, 8, @20@);
+        check_add(10, 6, @16@);
+        check_add(4, 1, @5@);
+        check_add(11, 7, @18@);
+        check_add(10, 13, @23@);
+        check_add(8, 7, @15@);
+        check_add(1, 9, @10@);
+        check_add(7, 3, @10@);
+        check_add(1, 4, @5@);
+        check_add(8, 0, @8@);
 
         -- Make this process wait indefinitely (it will never re-execute from
         -- its beginning again).
