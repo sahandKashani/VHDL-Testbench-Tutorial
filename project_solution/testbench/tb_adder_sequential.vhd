@@ -1,3 +1,13 @@
+-- #############################################################################
+-- tb_adder_sequential.vhd
+-- =======================
+-- Testbench for sequential adder.
+--
+-- Author        : Sahand Kashani-Akhavan [sahand.kashani-akhavan@epfl.ch]
+-- Revision      : 1.0
+-- Last modified : 2017.02.22
+-- #############################################################################
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -41,9 +51,9 @@ begin
     clk_generation : process
     begin
         if not sim_finished then
-            clk <= '1';
+            CLK <= '1';
             wait for CLK_PERIOD / 2;
-            clk <= '0';
+            CLK <= '0';
             wait for CLK_PERIOD / 2;
         else
             wait;

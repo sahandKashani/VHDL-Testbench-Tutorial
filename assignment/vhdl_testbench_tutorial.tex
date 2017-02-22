@@ -683,6 +683,33 @@ begin
 
 end architecture test;
             \end{lstlisting}
+
+            With this new updated code, any error detected in the simulation will result in an entry being written to the simulation transcript. Let's try to see what the transcript would look like when an error is detected: \\
+
+            The RTL code of the combinatorial adder we provide in the template is correct, so it is impossible to obtain an ``incorrect'' result to trigger the assertion failure. However, for testing purposes, we can artificially supply an incorrect \verb+res_expected+ argument to the \verb+check_add+ procedure to trigger the assertion failure and see what the description on the transcript looks like. \\
+
+            For example, let's change the line \verb+check_add(10, 13, 23)+ with \verb+check_add(10, 13, 22)+. If you now recompile and run the testbench, you should get the following output on the simulation transcript:
+
+            \begin{figure}[!h]
+                \begin{centering}
+                    \includegraphics[width=0.7\textwidth]{figs/waveform_combinatorial_transcript_assertion_failure.png}
+                    \caption{Assertion failure in ModelSim transcript}
+                    \label{fig:waveform_combinatorial_transcript_assertion_failure}
+                \end{centering}
+            \end{figure}
+
+            You can then double-click on \verb+Time: 500ns+ in the simulation transcript to make ModelSim automatically display a cursor at the specified location in the waveform. You should get something like this:
+
+            \begin{figure}[!h]
+                \begin{centering}
+                    \includegraphics[width=1.0\textwidth]{figs/waveform_combinatorial_assertion_failure_cursor.png}
+                    \caption{Cursor displayed at error location \texttt{500 ns}}
+                    \label{fig:waveform_combinatorial_assertion_failure_cursor}
+                \end{centering}
+            \end{figure}
+
+            Of course, the actual result obtained in the waveform is correct as we have artificially triggered the assertion by providing an incorrect expected result here.
+
         \end{subsubsection}
     \end{subsection}
 \end{section}
@@ -779,9 +806,9 @@ begin
     -- Generate CLK signal
     @clk_generation : process@
     @begin@
-        @clk <= '1';@
+        @CLK <= '1';@
         @wait for CLK_PERIOD / 2;@
-        @clk <= '0';@
+        @CLK <= '0';@
         @wait for CLK_PERIOD / 2;@
     @end process clk_generation;@
 
@@ -844,9 +871,9 @@ begin
     -- Generate CLK signal
     clk_generation : process
     begin
-        clk <= '1';
+        CLK <= '1';
         wait for CLK_PERIOD / 2;
-        clk <= '0';
+        CLK <= '0';
         wait for CLK_PERIOD / 2;
     end process clk_generation;
 
@@ -909,9 +936,9 @@ begin
     -- Generate CLK signal
     clk_generation : process
     begin
-        clk <= '1';
+        CLK <= '1';
         wait for CLK_PERIOD / 2;
-        clk <= '0';
+        CLK <= '0';
         wait for CLK_PERIOD / 2;
     end process clk_generation;
 
@@ -989,9 +1016,9 @@ begin
     -- Generate CLK signal
     clk_generation : process
     begin
-        clk <= '1';
+        CLK <= '1';
         wait for CLK_PERIOD / 2;
-        clk <= '0';
+        CLK <= '0';
         wait for CLK_PERIOD / 2;
     end process clk_generation;
 
@@ -1198,9 +1225,9 @@ begin
     clk_generation : process
     begin
         @if not sim_finished then@
-            clk <= '1';
+            CLK <= '1';
             wait for CLK_PERIOD / 2;
-            clk <= '0';
+            CLK <= '0';
             wait for CLK_PERIOD / 2;
         @else@
             @wait;@

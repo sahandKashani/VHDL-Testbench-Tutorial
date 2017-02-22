@@ -1,3 +1,13 @@
+-- #############################################################################
+-- tb_adder_combinatorial.vhd
+-- ==========================
+-- Testbench for combinatorial adder.
+--
+-- Author        : Sahand Kashani-Akhavan [sahand.kashani-akhavan@epfl.ch]
+-- Revision      : 1.0
+-- Last modified : 2017.02.22
+-- #############################################################################
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
