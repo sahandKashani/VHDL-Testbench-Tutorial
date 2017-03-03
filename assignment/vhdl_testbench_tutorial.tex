@@ -108,8 +108,9 @@
     \end{figure*}
 
     Note that the component being tested is often called the \emph{Design Under Test (DUT)}.
-
 \end{section}
+
+\clearpage
 
 \begin{section}{Setup}
     \begin{subsection}{Project structure}
@@ -166,7 +167,7 @@
                     \caption{ModelSim project creation}
                 \end{figure*}
 
-            \item Click on the \includegraphics[height=11pt]{figs/compile_all_icon.png} icon to compile all sources. The RTL files will compile successfully, but the testbenches will fail to compile (Figure~\ref{fig:compiling_with_empty_testbenches}). This is normal as the testbench files are empty, so ModelSim does not detect any entity to compile.
+            \item Click on the \includegraphics[height=11pt]{figs/compile_all_icon.png} icon to compile all sources. The RTL files will compile successfully, but the testbenches will fail to compile (Figure~\ref{fig:compiling_with_empty_testbenches}). This is normal as the testbench files are empty, so ModelSim does not detect any entity to compile. If your output is not as in Figure~\ref{fig:compiling_with_empty_testbenches}, then it means you have added the various VHDL files in a different order from that shown (``Order'' column in Figure~\ref{fig:compiling_with_empty_testbenches}). You can solve this issue by clicking a few more times on the \includegraphics[height=11pt]{figs/compile_all_icon.png} icon until ModelSim correctly determines the right compile order of the VHDL files based on their dependencies.
 
                 \begin{figure}[!h]
                     \begin{centering}
@@ -213,8 +214,6 @@ end tb_adder_combinatorial;
 @begin@
 @end architecture test;@
     \end{lstlisting}
-
-    \clearpage
 
     \begin{subsection}{Instantiating the DUT}
         \label{sec:combinatorial_instantiating_dut}
@@ -274,8 +273,6 @@ begin
 end architecture test;
         \end{lstlisting}
     \end{subsection}
-
-    \clearpage
 
     \begin{subsection}{Feeding inputs to the DUT}
         Now that the DUT is instantiated and wired into the testbench, we can start feeding it inputs to make the circuit actually do something.
@@ -412,8 +409,6 @@ end architecture test;
             The results look correct, i.e. $1 + 5 = 6$ and $3 + 2 = 5$, so at least the circuit is behaving correctly with these 2 input vectors. However, notice that the simulation is ``looping'' and is applying the two input vectors 3 times. Recall how processes work in VHDL. A process executes all its statements sequentially, then restarts. In the testbench, the simulation process uses 2 \verb+wait+ statements for a total of \SI{200}{\nano\second} of simulation time. Since we asked for a \SI{600}{\nano\second} simulation, the process had enough time to restart 3 times.
         \end{enumerate}
 
-        \clearpage
-
         \begin{subsubsection}{Automatic simulation termination}
             In Figure~\ref{fig:waveform_combinatorial_transcript_basic_version}, we saw that we had to manually provide the simulation interval, \SI{600}{\nano\second}, to ModelSim. Manually selecting the time interval is error-prone, as one may accidentally supply an interval too short for all test vectors to pass through the DUT, or too long and unnecessarily re-executing test vectors which have already passed through the DUT. \\
 
@@ -501,8 +496,6 @@ end architecture test;
             \end{figure*}
         \end{subsubsection}
 
-        \clearpage
-
         \begin{subsubsection}{Avoiding code duplication}
             Listing~\ref{lst:combinatorial_indefinite_wait_statement_added_to_simulation_process} is quite simple, but we can already see that there is a fair amount of code duplication going on. Every additional test vector requires copy-pasting the code responsible for the operand assignments and the \verb+wait+ statement. Although not exhaustive, we want to test the DUT with a potentially large number of test vectors to have more confidence in its correctness. However, a large number of test vectors would cause a huge increase in the simulation process' code size, therefore making it hard to read. \\
 
@@ -589,8 +582,6 @@ end architecture test;
                 \end{centering}
             \end{figure}
         \end{subsubsection}
-
-        \clearpage
 
         \begin{subsubsection}{Self-checking testbench}
             Listing~\ref{lst:combinatorial_refactored_test_vector_feeding_code} is easy to read and to modify, but there is one last thing which is quite cumbersome: verifying the DUT's outputs. With the current system, a human must visually check the DUT's outputs for correctness on the simulation waveform. Although not a difficult task, it is quite annoying and error-prone to have someone manually verify a waveform containing hundreds, perhaps thousands, of test vectors. \\
@@ -760,8 +751,6 @@ begin
 end architecture test;
         \end{lstlisting}
     \end{subsection}
-
-    \clearpage
 
     \begin{subsection}{Generating a clock signal}
         The sequential adder is a synchronous component as it is sensitive to a clock. We saw in Section~\ref{sec:combinatorial_basic_input_feeding} that, for simulation purposes, one can assign values to signals by using a VHDL process. We do the same in Listing~\ref{lst:sequential_process_generate_clk} specifically for generating the \verb+CLK+ input of the DUT.
