@@ -44,7 +44,7 @@
 % ============================================================================
 \setlength\parindent{0pt}
 
-\rcsInfo $Id: vhdl_testbench_tutorial.tex,v 1.0 2017/02/18 17:58:10 skashani Exp $
+\rcsInfo $Id: vhdl_testbench_tutorial.tex,v 1.1 2017/03/03 17:58:10 skashani Exp $
 
 \title{%
   VHDL Testbench Tutorial}
@@ -141,7 +141,7 @@
 
             \item Name the project \verb+vhdl_testbench_tutorial+ and choose the \textbf{modelsim} folder from the extracted archive for the \verb+Project Location+ (Figure~\ref{fig:create_project})
 
-            \item Click on the \verb+Add Existing File+ button and add all files in the \textbf{vhdl} and \textbf{testbench} directories to the project (Figure~\ref{fig:add_files_to_project}).
+            \item Click on the \verb+Add Existing File+ button and add all files in the \textbf{vhdl} and \textbf{testbench} directories to the project (Figure~\ref{fig:add_files_to_project}). You should obtain something similar to Figure~\ref{fig:files_added_to_project}.
 
                 \begin{figure*}[!h]
                     \centering
@@ -158,16 +158,20 @@
                         \caption{Add items files to the project}
                         \label{fig:add_files_to_project}
                     \end{subfigure}
-                    \begin{subfigure}[t]{1.0\textwidth}
-                        \centering
-                        \includegraphics[width=0.825\textwidth]{figs/files_added_to_project.png}
-                        \caption{Files added to project}
-                        \label{fig:files_added_to_project}
-                    \end{subfigure}
                     \caption{ModelSim project creation}
                 \end{figure*}
 
-            \item Click on the \includegraphics[height=11pt]{figs/compile_all_icon.png} icon to compile all sources. The RTL files will compile successfully, but the testbenches will fail to compile (Figure~\ref{fig:compiling_with_empty_testbenches}). This is normal as the testbench files are empty, so ModelSim does not detect any entity to compile. If your output is not as in Figure~\ref{fig:compiling_with_empty_testbenches}, then it means you have added the various VHDL files in a different order from that shown (``Order'' column in Figure~\ref{fig:compiling_with_empty_testbenches}). You can solve this issue by clicking a few more times on the \includegraphics[height=11pt]{figs/compile_all_icon.png} icon until ModelSim correctly determines the right compile order of the VHDL files based on their dependencies.
+                \begin{figure}[!h]
+                    \begin{centering}
+                        \includegraphics[width=0.825\textwidth]{figs/files_added_to_project.png}
+                        \caption{Files added to project}
+                        \label{fig:files_added_to_project}
+                    \end{centering}
+                \end{figure}
+
+            \newpage
+
+            \item Click on the \includegraphics[height=11pt]{figs/compile_all_icon.png} icon to compile all sources. The RTL files will compile successfully, but the testbenches will fail to compile (Figure~\ref{fig:compiling_with_empty_testbenches}). This is normal as the testbench files are empty, so ModelSim does not detect any entity to compile. If your output is not as in Figure~\ref{fig:compiling_with_empty_testbenches}, then it means you have added the various VHDL files in a different order from that shown in Figure~\ref{fig:files_added_to_project} (``Order'' column). You can solve this issue by clicking a few more times on the \includegraphics[height=11pt]{figs/compile_all_icon.png} icon until ModelSim correctly determines the right compile order of the VHDL files based on their dependencies.
 
                 \begin{figure}[!h]
                     \begin{centering}
@@ -219,7 +223,7 @@ end tb_adder_combinatorial;
         \label{sec:combinatorial_instantiating_dut}
         In order to test a component, we must have access to it. So the next step is to take the DUT, instantiate it, and wire it into the testbench. After this step, we would be able to interact with the DUT as if it were a component in the ``design'' (although we are not designing anything here, just testing). \\
 
-        Wiring the DUT into the testbench requires information about its entity. The combinatorial adder's entity is presented in Listing~\ref{lst:adder_combinatorial_entity}. Note that the DUT is \emph{generic}: at instantiation time, the component can be configured with a specific width depending on the value provided in its \verb+N_BITS+ parameter.
+        Wiring the DUT into the testbench requires information about its entity. The combinatorial adder's entity is presented in Listing~\ref{lst:adder_combinatorial_entity}.
 
         \begin{lstlisting}[caption={\texttt{adder\_combinatorial} entity}, label={lst:adder_combinatorial_entity}]
 entity adder_combinatorial is
@@ -234,12 +238,23 @@ entity adder_combinatorial is
 end entity adder_combinatorial;
         \end{lstlisting}
 
-        We extract the relevant information from the DUT's entity and update the testbench \emph{architecture} as follows:
+        Note that the DUT is \emph{generic}: at instantiation time, the component can be configured with a specific width depending on the value provided in its \verb+N_BITS+ parameter. Let's analyze this generic parameter, namely the line \verb+N_BITS : positive range 2 to positive'right+.
+
+        \begin{itemize}
+            \item \verb+N_BITS+ is declared as being of type \verb+positive+. In VHDL, \verb+positive+ is a constrained 32-bit integer type ranging from \verb+1+ to \verb+2147483647+. However, the DUT is a \emph{multi}-bit adder, so the author of the design provided a more constrained range than that of the standard \verb+positive+ type, namely a range with a lower bound of \verb+2+ instead of \verb+1+.
+
+            \item When constraining a type in VHDL, you must provide both a lower \emph{and} an upper bound (the language does not allow you to just constrain one ``side''). The \verb+right+ attribute of \verb+positive+ is used for this purpose here. When you write \verb+positive'right+, you are telling the VHDL compiler to take the ``rightmost'' value of the \verb+positive+ type as the upper bound of \verb+N_BITS+.
+        \end{itemize}
+
+        Now that we know what the DUT's entity looks like, we extract its details and update the testbench \emph{architecture} as follows:
 
         \begin{enumerate}
             \item Create a \emph{constant} for every \emph{generic} parameter in the DUT's entity. You must also assign a value to the constant, as it will be used to instantiate the DUT with the configuration we want to test. We chose to implement a 4-bit adder.
+
             \item Create a \emph{signal} for every \emph{port} in the DUT's entity.
         \end{enumerate}
+
+        Note that it is essential that you extract information from the DUT \emph{as-is}, and that you do not modify any bounds in the corresponding constant and signal declarations. This is necessary to guarantee that the testbench is in sync with what the DUT expects as inputs (it doesn't make any sense to testbench a DUT when you are instantiating it with incorrect parameters). \\
 
         Finally, we instantiate the DUT and wire it into the testbench with the signals created above.
 
@@ -363,6 +378,8 @@ end architecture test;
                     \label{fig:compiling_with_combinatorial_testbench}
                 \end{centering}
             \end{figure}
+
+            \newpage
 
             \item Go to \verb+Simulate > Start Simulation...+
 
@@ -582,6 +599,8 @@ end architecture test;
                 \end{centering}
             \end{figure}
         \end{subsubsection}
+
+        \newpage
 
         \begin{subsubsection}{Self-checking testbench}
             Listing~\ref{lst:combinatorial_refactored_test_vector_feeding_code} is easy to read and to modify, but there is one last thing which is quite cumbersome: verifying the DUT's outputs. With the current system, a human must visually check the DUT's outputs for correctness on the simulation waveform. Although not a difficult task, it is quite annoying and error-prone to have someone manually verify a waveform containing hundreds, perhaps thousands, of test vectors. \\
@@ -1135,15 +1154,17 @@ end architecture test;
 
                 \begin{figure}[!h]
                     \begin{centering}
-                        \includegraphics[width=0.5\textwidth]{figs/waveform_sequential_transcript_basic_version.png}
+                        \includegraphics[width=0.41\textwidth]{figs/waveform_sequential_transcript_basic_version.png}
                         \caption{Transcript}
                         \label{fig:waveform_sequential_transcript_basic_version}
                     \end{centering}
                 \end{figure}
 
+                \newpage
+
                 \begin{figure}[!h]
                     \begin{centering}
-                        \includegraphics[width=0.85\textwidth]{figs/waveform_sequential_process_reexecutes.png}
+                        \includegraphics[width=0.8\textwidth]{figs/waveform_sequential_process_reexecutes.png}
                         \caption{Waveform (repetitive input feeding)}
                         \label{fig:waveform_sequential_process_reexecutes}
                     \end{centering}
