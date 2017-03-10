@@ -44,7 +44,7 @@
 % ============================================================================
 \setlength\parindent{0pt}
 
-\rcsInfo $Id: vhdl_testbench_tutorial.tex,v 1.1 2017/03/03 17:58:10 skashani Exp $
+\rcsInfo $Id: vhdl_testbench_tutorial.tex,v 1.2 2017/03/10 17:58:10 skashani Exp $
 
 \title{%
   VHDL Testbench Tutorial}
@@ -68,7 +68,7 @@
 \begin{section}{Introduction}
     An engineer's job does not stop after having created a ``solution'' to a specific problem, but he/she must also be able to demonstrate, to various degrees of certitude, that the solution is \emph{correct}. This statement is equally valid in both software \& hardware engineering, but it is especially important in the hardware domain, as errors can generally not be fixed once a product has been shipped to customers! \\
 
-    When describing digital circuits in VHDL, one generally tests the correctness of their implementation with a VHDL \emph{testbench}. A testbench is an \emph{non-synthesizable} VHDL file which iteratively applies a sequence of controlled inputs to a circuit and compares its concrete output against the expected output. If a mismatch is detected, an error is displayed in the VHDL simulator's log which can then be consulted to help direct a designer search for the problem in the circuit's RTL description. \\
+    When describing digital circuits in VHDL, one generally tests the correctness of their implementation with a VHDL \emph{testbench}. A testbench is generally a \emph{non-synthesizable} VHDL file which iteratively applies a sequence of controlled inputs to a circuit and compares its concrete output against the expected output. If a mismatch is detected, an error is displayed in the VHDL simulator's log which can then be consulted to help direct a designer search for the problem in the circuit's RTL description. \\
 
     This tutorial introduces readers to the craft of writing simple VHDL testbenches. We start with an empty VHDL testbench file and iteratively explain our thought process and how it affects the way we construct the testbench. We start with a simple testbench for a combinatorial circuit, then move on towards a more complicated testbench for a sequential circuit. \\
 
@@ -78,6 +78,24 @@
 \end{section}
 
 \clearpage
+
+\begin{section}{Testbench architecture}
+    There are multiple ways of developing a testbench, but the one we will develop throughout this tutorial is shown in Figure~\ref{fig:testbench_architecture}. It consists of three 3 parts:
+
+    \begin{enumerate}
+        \item The component we want to test, i.e. the \emph{Design Under Test} (DUT).
+        \item A mechanism for supplying inputs to the DUT.
+        \item A mechanism for checking the outputs of the DUT against expected outputs.
+    \end{enumerate}
+
+    \begin{figure}[!h]
+        \begin{centering}
+            \includegraphics[width=0.825\textwidth]{figs/testbench_architecture.pdf}
+            \caption{Testbench architecture}
+            \label{fig:testbench_architecture}
+        \end{centering}
+    \end{figure}
+\end{section}
 
 \begin{section}{Victims / test subjects}
     We will be testing two RTL designs of a generic N-bit adder:
@@ -106,8 +124,6 @@
         \end{subfigure}
         \caption{Adders}
     \end{figure*}
-
-    Note that the component being tested is often called the \emph{Design Under Test (DUT)}.
 \end{section}
 
 \clearpage
